@@ -1,0 +1,14 @@
+﻿
+using Battleship.Data.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Battleship.Data.Entities
+{
+    public class Game
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int GameId { get; set; }
+        public string Description { get; set; }
+        public GameStatus GameStatus { get; set; }
+    }
+}
