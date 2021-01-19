@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Battleship.Data.Context.Interfaces;
 using Battleship.Logic.Services.Interfaces;
 using Battleship.Logic.Services;
+using Battleship.Hubs;
 
 namespace Battleship
 {
@@ -36,6 +37,8 @@ namespace Battleship
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,6 +69,7 @@ namespace Battleship
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapHub<GameHub>("/game");
             });
 
             app.UseSpa(spa =>

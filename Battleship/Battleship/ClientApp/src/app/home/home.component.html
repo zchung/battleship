@@ -1,3 +1,14 @@
 <div *ngIf="isLoading">Loading...</div>
 <input [(ngModel)]="description" />
 <button (click)="createGame()">Create new Game</button>
+
+<h2>List of Games</h2>
+<div class="row">
+  <div class="col-sm">Game name</div>
+</div>
+<div *ngIf="isLoadingGames">
+  Loading Games
+</div>
+<div class="row" *ngFor="let g of gameList">
+  <div class="col-sm">{{g.description}}</div>
+</div>
