@@ -2,9 +2,13 @@
 using Battleship.Controllers.Interfaces;
 using Battleship.Data.Entities;
 using Battleship.Data.Enums;
+using Battleship.Data.Models;
+using Battleship.Data.Models.ViewModels;
 using Battleship.Hubs;
 using Battleship.Hubs.Interfaces;
+using Battleship.Logic.Factories.Interfaces;
 using Battleship.Logic.Services.Interfaces;
+using Battleship.Models.Hub;
 using Battleship.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -17,12 +21,17 @@ namespace Battleship.Controllers
     public class GameController : ControllerBase, IGameController
     {
         private readonly IGameDbService _gameDbService;
-        private readonly IHubContext<GameHub, IGameHub> _hubContext;
+        private readonly IGameFactory _gameFactory;
+        private readonly IGameUpdateService _gameUpdateService;
+        private readonly IHubContext<GameHub, IGameHub> _gameHubContext;
 
-        public GameController(IGameDbService gameDbService, IHubContext<GameHub, IGameHub> hubContext)
+        public GameController(IGameDbService gameDbService, IGameFactory gameFactory, 
+                              IGameUpdateService gameUpdateService, IHubContext<GameHub, IGameHub> gameHubContext)
         {
             _gameDbService = gameDbService;
-            _hubContext = hubContext;
+            _gameFactory = gameFactory;
+            _gameUpdateService = gameUpdateService;
+            _gameHubContext = gameHubContext;
         }
 
         [HttpPost]
@@ -30,8 +39,19 @@ namespace Battleship.Controllers
         public async Task<IActionResult> Create(CreateGameRequest createGameRequest)
         {
             Game game = new Game { GameStatus = GameStatus.Active, Description = createGameRequest.Description };
-            var result = await _gameDbService.Create(game);
-            await _hubContext.Clients.All.SendNewGame(result.Data);
+            var gameCreateResult = await _gameDbService.Create(game);
+            Result<GameViewModel> result = new Result<GameViewModel>();
+            if (gameCreateResult.Success)
+            {
+                result.Success = gameCreateResult.Success;
+                result.Data = _gameFactory.GetGameViewModel(gameCreateResult.Data, 1);
+                var gameListModel = _gameFactory.GetGameListViewModel(gameCreateResult.Data);
+                await _gameHubContext.Clients.All.SendNewGame(gameListModel);
+            }
+            else
+            {
+                result.Message = gameCreateResult.Message;
+            }
             return Ok(result);
         }
 
@@ -41,6 +61,26 @@ namespace Battleship.Controllers
         {
             var result = await _gameDbService.GetActiveGames();
 
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("join")]
+        public async Task<IActionResult> Join(JoinGameRequest joinGameRequest)
+        {
+            var updateGameResult =  await _gameUpdateService.UpdateGameAfterPlayerJoins(joinGameRequest.GameId);
+            Result<GameViewModel> result = new Result<GameViewModel>();
+            if (updateGameResult.Success)
+            {
+                result.Data = _gameFactory.GetGameViewModel(updateGameResult.Data, 2);
+                result.Success = updateGameResult.Success;
+                await _gameHubContext.Clients.All.RemoveGame(_gameFactory.GetGameListViewModel(updateGameResult.Data));
+                await _gameHubContext.Clients.All.SendPlayerHasJoined(new JoinedPlayer(result.Data.GameId, result.Data.PlayerId));
+            }
+            else
+            {
+                result.Message = updateGameResult.Message;
+            }
             return Ok(result);
         }
     }
