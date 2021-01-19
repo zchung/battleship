@@ -4,7 +4,11 @@ using Battleship.Data.Entities;
 using Battleship.Data.Models;
 using Battleship.Logic.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using Battleship.Data.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Battleship.Logic.Services
 {
@@ -19,14 +23,14 @@ namespace Battleship.Logic.Services
         {
             _battleshipDbContext = battleshipDbContext;
         }
-        public async Task<Result<int>> Create(Game game)
+        public async Task<Result<Game>> Create(Game game)
         {
-            Result<int> result = new Result<int>();
+            Result<Game> result = new Result<Game>();
             try
             {
                 await _battleshipDbContext.AddAsync(game);
                 await _battleshipDbContext.SaveChangesAsync();
-                result.Data = game.GameId;
+                result.Data = game;
                 result.Success = true;
             }
             catch (Exception ex)
@@ -35,6 +39,22 @@ namespace Battleship.Logic.Services
                 Console.WriteLine(ex.Message); //normally would log to a service here.
             }
             
+            return result;
+        }
+
+        public async Task<Result<IEnumerable<Game>>> GetActiveGames()
+        {
+            Result<IEnumerable<Game>> result = new Result<IEnumerable<Game>>();
+            try
+            {
+                result.Data = await _battleshipDbContext.Games.Where(x => x.GameStatus == GameStatus.Active).ToListAsync();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Error getting games";
+                Console.WriteLine(ex.Message); //normally would log to a service here.
+            }
             return result;
         }
     }

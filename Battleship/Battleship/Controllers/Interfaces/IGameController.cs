@@ -8,5 +8,7 @@ namespace Battleship.Controllers.Interfaces
     public interface IGameController
     {
         Task<IActionResult> Create(CreateGameRequest createGameRequest);
+
+        Task<IActionResult> GetActive();
     }
 }

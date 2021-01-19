@@ -3,19 +3,28 @@ using Battleship.Data.Context.Interfaces;
 using Battleship.Data.Entities;
 using Battleship.Logic.Services;
 using Battleship.Logic.Services.Interfaces;
+using BrandManager.Common.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using Battleship.Data.Enums;
 
 namespace Battleship.Tests.Services
 {
     [TestClass]
-    public class GameDbServicesTests
+    public class GameDbServicesTests : TestBase
     {
         private Mock<IBattleshipDbContext> _battleshipDbContext;
         private IGameDbService _gameDbServices;
+
+        public GameDbServicesTests()
+        {
+        }
 
         [TestInitialize]
         public void Initalise()
@@ -43,6 +52,18 @@ namespace Battleship.Tests.Services
 
             Assert.IsNotNull(result);
             Assert.IsFalse(result.Success);
+        }
+
+        [TestMethod]
+        public async Task GetActiveGames_Should_Return_The_List_Of_Games_With_No_Error()
+        {
+            _battleshipDbContext.Setup(s => s.Games).Returns(SetupDbContextList(new TestAsyncEnumerable<Game>(new List<Game> { new Game { GameId = 1, GameStatus= GameStatus.Active} }.AsQueryable())));
+
+            var result = await _gameDbServices.GetActiveGames();
+
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(result.Data);
+            Assert.IsTrue(result.Data.Any());
         }
     }
 }
