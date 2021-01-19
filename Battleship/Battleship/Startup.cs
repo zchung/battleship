@@ -10,6 +10,8 @@ using Battleship.Data.Context.Interfaces;
 using Battleship.Logic.Services.Interfaces;
 using Battleship.Logic.Services;
 using Battleship.Hubs;
+using Battleship.Logic.Factories.Interfaces;
+using Battleship.Logic.Factories;
 
 namespace Battleship
 {
@@ -27,6 +29,8 @@ namespace Battleship
         {
 
             services.AddScoped<IGameDbService, GameDbService>();
+            services.AddScoped<IGameFactory, GameFactory>();
+            services.AddScoped<IGameUpdateService, GameUpdateService>();
 
             services.AddDbContext<IBattleshipDbContext, BattleshipDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 

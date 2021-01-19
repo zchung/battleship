@@ -10,5 +10,6 @@ namespace Battleship.Controllers.Interfaces
         Task<IActionResult> Create(CreateGameRequest createGameRequest);
 
         Task<IActionResult> GetActive();
+        Task<IActionResult> Join(JoinGameRequest joinGameRequest);
     }
 }

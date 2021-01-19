@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Battleship.Data.Enums;
 using Microsoft.EntityFrameworkCore;
+using Battleship.Data.Models.ViewModels;
 
 namespace Battleship.Logic.Services
 {
@@ -42,18 +43,61 @@ namespace Battleship.Logic.Services
             return result;
         }
 
-        public async Task<Result<IEnumerable<Game>>> GetActiveGames()
+        public async Task<Result<IEnumerable<GameListViewModel>>> GetActiveGames()
         {
-            Result<IEnumerable<Game>> result = new Result<IEnumerable<Game>>();
+            Result<IEnumerable<GameListViewModel>> result = new Result<IEnumerable<GameListViewModel>>();
             try
             {
-                result.Data = await _battleshipDbContext.Games.Where(x => x.GameStatus == GameStatus.Active).ToListAsync();
+                result.Data = await _battleshipDbContext.Games.Where(x => x.GameStatus == GameStatus.Active)
+                    .Select(s => new GameListViewModel 
+                    { 
+                        GameId = s.GameId,
+                        Description = s.Description
+                    }).ToListAsync();
                 result.Success = true;
             }
             catch (Exception ex)
             {
                 result.Message = "Error getting games";
                 Console.WriteLine(ex.Message); //normally would log to a service here.
+            }
+            return result;
+        }
+
+        public Result<Game> GetById(int id)
+        {
+            Result<Game> result = new Result<Game>();
+            try
+            {
+                result.Data = _battleshipDbContext.Games.FirstOrDefault(x => x.GameId == id);
+                if (result.Data == null)
+                {
+                    result.Message = "Invalid Id";
+                }
+                else
+                {
+                    result.Success = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Error getting game";
+                Console.WriteLine(ex.Message);
+            }
+            return result;
+        }
+
+        public async Task<Result> SaveChangesAsync()
+        {
+            Result result = new Result();
+            try
+            {
+                await _battleshipDbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Error Saving Game";
+                Console.WriteLine(ex.Message); // Logger here.
             }
             return result;
         }

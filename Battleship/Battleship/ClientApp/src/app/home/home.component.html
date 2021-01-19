@@ -1,14 +1,27 @@
-<div *ngIf="isLoading">Loading...</div>
+<div class="spinner-border" *ngIf="isLoading">
+  <span class="sr-only">Loading...</span>
+</div>
 <input [(ngModel)]="description" />
-<button (click)="createGame()">Create new Game</button>
+<button class="btn btn-primary" (click)="createGame()">Create new Game</button>
+
+
+<div class="spinner-border" *ngIf="isLoadingGames">
+  <span class="sr-only">Loading Games...</span>
+</div>
 
 <h2>List of Games</h2>
-<div class="row">
-  <div class="col-sm">Game name</div>
-</div>
-<div *ngIf="isLoadingGames">
-  Loading Games
-</div>
-<div class="row" *ngFor="let g of gameList">
-  <div class="col-sm">{{g.description}}</div>
-</div>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let g of gameList">
+      <td>{{g.description}}</td>
+      <td>
+        <button type="button" (click)="joinGame(g.gameId)" class="btn btn-secondary">Join Game</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

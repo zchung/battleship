@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
-import { Game } from '../models/game';
+import { GameModel } from '../models/game-model';
+import { JoinedPlayer } from '../models/joined-player';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +21,27 @@ private baseUrl: string;
       .then(() => console.log('Connection started'))
       .catch(err => console.log('Error while starting connection: ' + err))
   }
-  public addNewGameListener = (callBack: (game: Game) => void) => {
+  public addNewGameListener = (callBack: (game: GameModel) => void) => {
     this.hubConnection.on('sendnewgame', (data) => {
       if (callBack) {
         callBack(data);
       }
     });
+  }
+
+  public addRemoveGameListener = (callBack: (game: GameModel) => void) => {
+    this.hubConnection.on('removegame', (data) => {
+      if (callBack) {
+        callBack(data);
+      }
+    });
+  }
+
+  public addPlayerJoinedGameListener = (callBack: (joinedPlayer: JoinedPlayer) => void) => {
+    this.hubConnection.on('sendplayerhasjoined', (data) => {
+      if (callBack) {
+        callBack(data);
+      }
+    })
   }
 }

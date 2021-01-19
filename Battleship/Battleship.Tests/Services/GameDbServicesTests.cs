@@ -65,5 +65,43 @@ namespace Battleship.Tests.Services
             Assert.IsNotNull(result.Data);
             Assert.IsTrue(result.Data.Any());
         }
+
+        [TestMethod]
+        public void GetById_Should_Return_The_Correct_Game_If_It_Exists()
+        {
+            Game testGame = new Game { GameId = 1 };
+            _battleshipDbContext.Setup(s => s.Games).Returns(SetupDbContextList(new List<Game> { testGame }.AsQueryable()));
+
+            var result = _gameDbServices.GetById(testGame.GameId);
+
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(result.Data);
+            Assert.AreEqual(testGame.GameId, result.Data.GameId);
+        }
+
+        [TestMethod]
+        public void GetById_Should_Return_Error_If_The_Id_Is_Invalid()
+        {
+            Game testGame = new Game { GameId = 1 };
+            _battleshipDbContext.Setup(s => s.Games).Returns(SetupDbContextList(new List<Game> { testGame }.AsQueryable()));
+
+            var result = _gameDbServices.GetById(2);
+
+            Assert.IsFalse(result.Success);
+            Assert.IsNull(result.Data);
+            Assert.IsNotNull(result.Message);
+        }
+
+        [TestMethod]
+        public void GetById_Should_Return_Error_If_The_Db_Throws_An_Error()
+        {
+            _battleshipDbContext.Setup(s => s.Games).Throws(new Exception());
+
+            var result = _gameDbServices.GetById(2);
+
+            Assert.IsFalse(result.Success);
+            Assert.IsNull(result.Data);
+            Assert.IsNotNull(result.Message);
+        }
     }
 }
