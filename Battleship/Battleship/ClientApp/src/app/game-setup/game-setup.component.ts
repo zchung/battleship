@@ -82,7 +82,7 @@ export class GameSetupComponent implements OnInit {
       return;
     }
 
-    const currentShipModel: ShipModel = this.currentGame.ships.find(x => x.shipType === parseInt(this.selectedShipType));
+    const currentShipModel: ShipModel = this.currentGame.ships.find(x => x.shipType === parseInt(this.selectedShipType.toString()));
 
     const request = new UpdateShipPositionRequest(this.currentGame.gameId, this.currentGame.playerId, parseInt(this.selectedShipType.toString()),
                                                   coordinates, parseInt(this.selectedOrientation.toString()));

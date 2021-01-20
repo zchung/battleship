@@ -78,7 +78,7 @@ namespace Battleship.Tests.Controllers
             var result = await _gameController.Join(new JoinGameRequest { GameId = 1 });
 
             _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<List>()), Times.Once);
-            _gameHubContext.Verify(v => v.Clients.All.SendPlayerHasJoined(It.IsAny<JoinedPlayer>()), Times.Once);
+            _gameHubContext.Verify(v => v.Clients.All.SendPlayerHasJoined(It.IsAny<UpdatedPlayer>()), Times.Once);
 
             var castResult = ValidateOkResult<Result<GameViewModel>>(result);
             Assert.IsTrue(castResult.Success);
@@ -107,6 +107,21 @@ namespace Battleship.Tests.Controllers
             var castResult = ValidateOkResult<Result<GameViewModel>>(result);
             Assert.IsFalse(castResult.Success);
             Assert.IsNotNull(castResult.Message);
+        }
+
+        [TestMethod]
+        public async Task SetGameToPrepared_Should_Return_The_Result()
+        {
+            _gameUpdateService.Setup(s => s.UpdatePlayerToPrepared(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(new Result { Success = true});
+            var gameHub = new Mock<IGameHub>();
+            _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
+
+            var result = await _gameController.SetPlayerToPrepared(new GamePlayerRequest { GameId = 1, PlayerId = 1 });
+
+            _gameHubContext.Verify(v => v.Clients.All.SendPlayerIsPrepared(It.IsAny<UpdatedPlayer>()), Times.Once);
+
+            var castResult = ValidateOkResult<Result>(result);
+            Assert.IsTrue(castResult.Success);
         }
     }
 }

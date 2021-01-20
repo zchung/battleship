@@ -12,5 +12,7 @@ namespace Battleship.Data.Entities
         public GameStatus GameStatus { get; set; }
         public string Player1ShipsJSON { get; set; }
         public string Player2ShipsJSON { get; set; }
+        public PlayerStatus Player1Status { get; set; }
+        public PlayerStatus Player2Status { get; set; }
     }
 }

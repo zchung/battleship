@@ -14,5 +14,10 @@ namespace Battleship.Logic.ViewModels
         {
             Coordinates = new List<CoordinatesViewModel>();
         }
+
+        public bool IsPlaced()
+        {
+            return Coordinates.Count == Size;
+        }
     }
 }

@@ -2,10 +2,12 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Result } from '../models/result-data';
+import * as result from '../models/result';
 import { CreateGameRequest } from '../models/requests/create-game-request';
 import { GameModel } from '../models/game-model';
 import { GameListModel } from '../models/game-list-model';
 import { JoinGameRequest } from '../models/requests/join-game-request';
+import { GamePlayerRequest } from '../models/requests/game-player-request';
 @Injectable({
   providedIn: 'root'
 })
@@ -29,5 +31,9 @@ export class GameApiService {
 
   getGame(gameId: number, playerId: number): Observable<Result<GameModel>> {
     return this.http.get<Result<GameModel>>(`${this.baseUrl}get/${gameId}/${playerId}`);
+  }
+
+  setGameToPrepared(gamePlayerRequest: GamePlayerRequest): Observable<result.Result> {
+    return this.http.post<result.Result>(`${this.baseUrl}setPlayerToPrepared`, gamePlayerRequest);
   }
 }

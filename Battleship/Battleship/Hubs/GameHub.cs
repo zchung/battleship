@@ -18,9 +18,14 @@ namespace Battleship.Hubs
             await Clients.All.RemoveGame(game);
         }
 
-        public async Task SendPlayerHasJoined(JoinedPlayer joinedPlayer)
+        public async Task SendPlayerHasJoined(UpdatedPlayer updatedPlayer)
         {
-            await Clients.All.SendPlayerHasJoined(joinedPlayer);
+            await Clients.All.SendPlayerHasJoined(updatedPlayer);
+        }
+
+        public async Task SendPlayerIdPrepared(UpdatedPlayer updatedPlayer)
+        {
+            await Clients.All.SendPlayerIsPrepared(updatedPlayer);
         }
     }
 }

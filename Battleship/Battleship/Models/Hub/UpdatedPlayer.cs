@@ -1,12 +1,12 @@
 ﻿
 namespace Battleship.Models.Hub
 {
-    public class JoinedPlayer
+    public class UpdatedPlayer
     {
         public int GameId { get; set; }
         public int PlayerId { get; set; }
 
-        public JoinedPlayer(int gameId, int playerId)
+        public UpdatedPlayer(int gameId, int playerId)
         {
             GameId = gameId;
             PlayerId = playerId;

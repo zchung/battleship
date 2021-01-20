@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import { GameModel } from '../models/game-model';
-import { JoinedPlayer } from '../models/joined-player';
+import { UpdatedPlayer } from '../models/updated-player';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +37,7 @@ private baseUrl: string;
     });
   }
 
-  public addPlayerJoinedGameListener = (callBack: (joinedPlayer: JoinedPlayer) => void) => {
+  public addPlayerJoinedGameListener = (callBack: (joinedPlayer: UpdatedPlayer) => void) => {
     this.hubConnection.on('sendplayerhasjoined', (data) => {
       if (callBack) {
         callBack(data);
