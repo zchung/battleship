@@ -6,8 +6,8 @@ namespace Battleship.Hubs.Interfaces
 {
     public interface IGameHub
     {
-        Task SendNewGame(GameListViewModel game);
-        Task RemoveGame(GameListViewModel game);
+        Task SendNewGame(List game);
+        Task RemoveGame(List game);
         Task SendPlayerHasJoined(JoinedPlayer joinedPlayer);
     }
 }

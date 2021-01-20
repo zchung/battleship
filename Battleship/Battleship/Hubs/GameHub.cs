@@ -8,12 +8,12 @@ namespace Battleship.Hubs
 {
     public class GameHub : Hub<IGameHub>
     {
-        public async Task SendNewGame(GameListViewModel game)
+        public async Task SendNewGame(List game)
         {
             await Clients.All.SendNewGame(game);
         }
 
-        public async Task RemoveGame(GameListViewModel game)
+        public async Task RemoveGame(List game)
         {
             await Clients.All.RemoveGame(game);
         }

@@ -10,7 +10,7 @@ import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { GameSetupComponent } from './game-setup/game-setup.component';
-import { GameApiService } from './Services/game-api-services';
+import { GameGridComponent } from './game-grid/game-grid.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,8 @@ import { GameApiService } from './Services/game-api-services';
     HomeComponent,
     CounterComponent,
     FetchDataComponent,
-    GameSetupComponent
+    GameSetupComponent,
+    GameGridComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -29,10 +30,10 @@ import { GameApiService } from './Services/game-api-services';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
-      { path: 'game-setup', component: GameSetupComponent }
+      { path: 'game-setup/:gameId/:playerId', component: GameSetupComponent }
     ])
   ],
-  providers: [GameApiService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

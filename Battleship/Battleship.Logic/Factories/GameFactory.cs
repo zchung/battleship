@@ -15,9 +15,9 @@ namespace Battleship.Logic.Factories
         {
             _shipFactory = shipFactory;
         }
-        public GameListViewModel GetGameListViewModel(Game game)
+        public List GetGameListViewModel(Game game)
         {
-            return new GameListViewModel
+            return new List
             {
                 GameId = game.GameId,
                 Description = game.Description

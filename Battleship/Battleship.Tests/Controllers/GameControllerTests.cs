@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Battleship.Tests.Controllers
 {    
     [TestClass]
-    public class GameControllerTests
+    public class GameControllerTests : ControllerTestBase
     {
         private Mock<IGameDbService> _gameDbService;
         private Mock<IGameFactory> _gameFactory;
@@ -44,12 +44,12 @@ namespace Battleship.Tests.Controllers
             var gameHub = new Mock<IGameHub>();
             _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel());
-            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new GameListViewModel());
+            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
             _gameFactory.Setup(s => s.CreateNewGame(It.IsAny<string>())).Returns(new Game());
 
             var result = await _gameController.Create(new CreateGameRequest());
 
-            _gameHubContext.Verify(v => v.Clients.All.SendNewGame(It.IsAny<GameListViewModel>()), Times.Once);
+            _gameHubContext.Verify(v => v.Clients.All.SendNewGame(It.IsAny<List>()), Times.Once);
 
             var castResult = ValidateOkResult<Result<GameViewModel>>(result);
             Assert.IsTrue(castResult.Success);
@@ -58,11 +58,11 @@ namespace Battleship.Tests.Controllers
         [TestMethod]
         public async Task GetActive_Should_Return_The_Result()
         {
-            _gameDbService.Setup(s => s.GetActiveGames()).ReturnsAsync(new Result<IEnumerable<GameListViewModel>> { Success = true });
+            _gameDbService.Setup(s => s.GetActiveGames()).ReturnsAsync(new Result<IEnumerable<List>> { Success = true });
 
             var result = await _gameController.GetActive();
 
-            var castresult = ValidateOkResult<Result<IEnumerable<GameListViewModel>>>(result);
+            var castresult = ValidateOkResult<Result<IEnumerable<List>>>(result);
             Assert.IsTrue(castresult.Success);
         }
 
@@ -71,25 +71,42 @@ namespace Battleship.Tests.Controllers
         {
             _gameUpdateService.Setup(s => s.UpdateGameAfterPlayerJoins(1)).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true });
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 2)).Returns(new GameViewModel());
-            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new GameListViewModel());
+            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
             var gameHub = new Mock<IGameHub>();
             _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
 
             var result = await _gameController.Join(new JoinGameRequest { GameId = 1 });
 
-            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<GameListViewModel>()), Times.Once);
+            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<List>()), Times.Once);
             _gameHubContext.Verify(v => v.Clients.All.SendPlayerHasJoined(It.IsAny<JoinedPlayer>()), Times.Once);
 
             var castResult = ValidateOkResult<Result<GameViewModel>>(result);
             Assert.IsTrue(castResult.Success);
         }
 
-        private T ValidateOkResult<T>(IActionResult result)
+        [TestMethod]
+        public void Get_Should_Return_The_Game_Data_If_Found()
         {
-            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
-            var okObject =  result as OkObjectResult;
-            Assert.IsInstanceOfType(okObject.Value, typeof(T));
-            return (T)okObject.Value;
+            _gameDbService.Setup(s => s.GetById(It.IsAny<int>())).Returns(new Result<Game> { Data = new Game(), Success = true });
+            _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), It.IsAny<int>())).Returns(new GameViewModel());
+
+            var result = _gameController.Get(1, 1);
+
+            var castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            Assert.IsTrue(castResult.Success);
+            Assert.IsNotNull(castResult.Data);
+        }
+
+        [TestMethod]
+        public void Get_Should_Return_The_Result_If_Game_Not_Found()
+        {
+            _gameDbService.Setup(s => s.GetById(It.IsAny<int>())).Returns(new Result<Game> { Success = false, Message = "error" });
+
+            var result = _gameController.Get(1, 1);
+
+            var castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            Assert.IsFalse(castResult.Success);
+            Assert.IsNotNull(castResult.Message);
         }
     }
 }

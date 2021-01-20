@@ -1,7 +1,7 @@
 ﻿
 namespace Battleship.Logic.ViewModels
 {
-    public class GameListViewModel
+    public class List
     {
         public int GameId { get; set; }
         public string Description { get; set; }
