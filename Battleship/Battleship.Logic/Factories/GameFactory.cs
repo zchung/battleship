@@ -1,12 +1,20 @@
 ﻿
 using Battleship.Data.Entities;
-using Battleship.Data.Models.ViewModels;
+using Battleship.Logic.ViewModels;
 using Battleship.Logic.Factories.Interfaces;
+using Battleship.Data.Enums;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Battleship.Logic.Factories
 {
     public class GameFactory : IGameFactory
     {
+        private readonly IShipFactory _shipFactory;
+        public GameFactory(IShipFactory shipFactory)
+        {
+            _shipFactory = shipFactory;
+        }
         public GameListViewModel GetGameListViewModel(Game game)
         {
             return new GameListViewModel
@@ -22,9 +30,21 @@ namespace Battleship.Logic.Factories
             {
                 GameId = game.GameId,
                 Description = game.Description,
-                PlayerId = playerId
+                PlayerId = playerId,
+                Ships = playerId == 1 ? JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player1ShipsJSON) : JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player2ShipsJSON)
             };
 
+        }
+
+        public Game CreateNewGame(string description)
+        {
+            return new Game
+            {
+                Description = description,
+                GameStatus = GameStatus.Active,
+                Player1ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips()),
+                Player2ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips())
+            };
         }
     }
 }

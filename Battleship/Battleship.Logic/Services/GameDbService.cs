@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Battleship.Data.Enums;
 using Microsoft.EntityFrameworkCore;
-using Battleship.Data.Models.ViewModels;
+using Battleship.Logic.ViewModels;
 
 namespace Battleship.Logic.Services
 {

@@ -1,6 +1,6 @@
 ﻿
 using Battleship.Data.Entities;
-using Battleship.Data.Models.ViewModels;
+using Battleship.Logic.ViewModels;
 
 namespace Battleship.Logic.Factories.Interfaces
 {
@@ -8,5 +8,6 @@ namespace Battleship.Logic.Factories.Interfaces
     {
         GameViewModel GetGameViewModel(Game game, int playerId);
         GameListViewModel GetGameListViewModel(Game game);
+        Game CreateNewGame(string description);
     }
 }

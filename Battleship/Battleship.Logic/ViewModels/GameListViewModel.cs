@@ -1,5 +1,5 @@
 ﻿
-namespace Battleship.Data.Models.ViewModels
+namespace Battleship.Logic.ViewModels
 {
     public class GameListViewModel
     {

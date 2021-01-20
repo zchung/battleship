@@ -1,4 +1,4 @@
-﻿using Battleship.Data.Models.ViewModels;
+﻿using Battleship.Logic.ViewModels;
 using Battleship.Models.Hub;
 using System.Threading.Tasks;
 

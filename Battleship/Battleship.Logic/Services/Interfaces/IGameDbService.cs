@@ -1,7 +1,7 @@
 ﻿
 using Battleship.Data.Entities;
 using Battleship.Data.Models;
-using Battleship.Data.Models.ViewModels;
+using Battleship.Logic.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
