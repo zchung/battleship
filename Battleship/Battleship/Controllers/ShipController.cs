@@ -6,6 +6,7 @@ using Battleship.Logic.ViewModels;
 using Battleship.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Battleship.Controllers
@@ -28,7 +29,7 @@ namespace Battleship.Controllers
         [Route("updateshipposition")]
         public async Task<IActionResult> UpdateShipPosition(UpdateShipPositionRequest updateShipPositionRequest)
         {
-            Result<GameViewModel> result = new Result<GameViewModel>();
+            Result<ShipViewModel> result = new Result<ShipViewModel>();
             var gameResult = _gameDbService.GetById(updateShipPositionRequest.GameId);
             if (gameResult.Success)
             {
@@ -49,7 +50,7 @@ namespace Battleship.Controllers
                     {
 
                         result.Success = true;
-                        result.Data = gameViewModel;
+                        result.Data = gameViewModel.Ships.FirstOrDefault(x => x.ShipType == updateShipPositionRequest.ShipType);
                     }
                     else
                     {

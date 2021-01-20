@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { GameModel } from '../models/game-model';
 import { UpdateShipPositionRequest } from '../models/requests/update-ship-position-request';
 import { Result } from '../models/result-data';
+import { ShipModel } from '../models/ship-model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class ShipApiService {
     this.baseUrl = `${baseUrl}Ship/`;
   }
 
-  public updateShipPosition(request: UpdateShipPositionRequest): Observable<Result<GameModel>> {
-    return this.http.post<Result<GameModel>>(`${this.baseUrl}updateshipposition`, request);
+  public updateShipPosition(request: UpdateShipPositionRequest): Observable<Result<ShipModel>> {
+    return this.http.post<Result<ShipModel>>(`${this.baseUrl}updateshipposition`, request);
   }
 }

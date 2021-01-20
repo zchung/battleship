@@ -34,19 +34,19 @@ namespace Battleship.Tests.Controllers
         public async Task UpdateShipPosition_Should_Invoke_The_Correct_Methods()
         {
             _gameDbService.Setup(s => s.GetById(It.IsAny<int>())).Returns(new Result<Game> { Data = new Game(), Success = true });
-            _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), It.IsAny<int>())).Returns(new GameViewModel { Ships = new List<ShipViewModel>() });
+            _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), It.IsAny<int>())).Returns(new GameViewModel { Ships = new List<ShipViewModel> { new ShipViewModel { ShipType = ShipType.Cruiser } } });
             _shipUpdateService.Setup(s => s.UpdateShipPosition(It.IsAny<List<ShipViewModel>>(), It.IsAny<CoordinatesViewModel>(), It.IsAny<ShipType>(), It.IsAny<ShipOrientationType>())).Returns(new Result { Success = true });
             _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
 
             var result = await _shipController.UpdateShipPosition(new UpdateShipPositionRequest { GameId = 1, PlayerId = 1, ShipOrientationType = ShipOrientationType.HorizontalRight, ShipType = ShipType.Cruiser, StartPosition = new CoordinatesViewModel(1, 1) });
 
-            var castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            var castResult = ValidateOkResult<Result<ShipViewModel>>(result);
             Assert.IsTrue(castResult.Success);
             Assert.IsNotNull(castResult.Data);
 
             result = await _shipController.UpdateShipPosition(new UpdateShipPositionRequest { GameId = 1, PlayerId = 2, ShipOrientationType = ShipOrientationType.HorizontalRight, ShipType = ShipType.Cruiser, StartPosition = new CoordinatesViewModel(1, 1) });
 
-            castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            castResult = ValidateOkResult<Result<ShipViewModel>>(result);
             Assert.IsTrue(castResult.Success);
             Assert.IsNotNull(castResult.Data);
         }
@@ -58,7 +58,7 @@ namespace Battleship.Tests.Controllers
 
             var result = await _shipController.UpdateShipPosition(new UpdateShipPositionRequest { GameId = 1, PlayerId = 1, ShipOrientationType = ShipOrientationType.HorizontalRight, ShipType = ShipType.Cruiser, StartPosition = new CoordinatesViewModel(1, 1) });
 
-            var castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            var castResult = ValidateOkResult<Result<ShipViewModel>>(result);
             Assert.IsFalse(castResult.Success);
             Assert.IsNotNull(castResult.Message);
         }
@@ -72,7 +72,7 @@ namespace Battleship.Tests.Controllers
 
             var result = await _shipController.UpdateShipPosition(new UpdateShipPositionRequest { GameId = 1, PlayerId = 1, ShipOrientationType = ShipOrientationType.HorizontalRight, ShipType = ShipType.Cruiser, StartPosition = new CoordinatesViewModel(1, 1) });
 
-            var castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            var castResult = ValidateOkResult<Result<ShipViewModel>>(result);
             Assert.IsFalse(castResult.Success);
             Assert.IsNotNull(castResult.Message);
         }
@@ -87,7 +87,7 @@ namespace Battleship.Tests.Controllers
 
             var result = await _shipController.UpdateShipPosition(new UpdateShipPositionRequest { GameId = 1, PlayerId = 1, ShipOrientationType = ShipOrientationType.HorizontalRight, ShipType = ShipType.Cruiser, StartPosition = new CoordinatesViewModel(1, 1) });
 
-            var castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            var castResult = ValidateOkResult<Result<ShipViewModel>>(result);
             Assert.IsFalse(castResult.Success);
             Assert.IsNotNull(castResult.Message);
         }

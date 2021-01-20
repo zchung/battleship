@@ -11,6 +11,7 @@ import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { GameSetupComponent } from './game-setup/game-setup.component';
 import { GameGridComponent } from './game-grid/game-grid.component';
+import { CellStylePipe } from './pipes/cell-style-pipe';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { GameGridComponent } from './game-grid/game-grid.component';
     CounterComponent,
     FetchDataComponent,
     GameSetupComponent,
-    GameGridComponent
+    GameGridComponent,
+    CellStylePipe
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
