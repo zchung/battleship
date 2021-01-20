@@ -3,7 +3,7 @@ using Battleship.Controllers.Interfaces;
 using Battleship.Data.Entities;
 using Battleship.Data.Enums;
 using Battleship.Data.Models;
-using Battleship.Data.Models.ViewModels;
+using Battleship.Logic.ViewModels;
 using Battleship.Hubs;
 using Battleship.Hubs.Interfaces;
 using Battleship.Logic.Factories.Interfaces;
@@ -38,7 +38,7 @@ namespace Battleship.Controllers
         [Route("create")]
         public async Task<IActionResult> Create(CreateGameRequest createGameRequest)
         {
-            Game game = new Game { GameStatus = GameStatus.Active, Description = createGameRequest.Description };
+            Game game = _gameFactory.CreateNewGame(createGameRequest.Description);
             var gameCreateResult = await _gameDbService.Create(game);
             Result<GameViewModel> result = new Result<GameViewModel>();
             if (gameCreateResult.Success)

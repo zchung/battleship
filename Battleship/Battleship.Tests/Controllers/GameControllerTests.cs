@@ -2,7 +2,7 @@
 using Battleship.Controllers.Interfaces;
 using Battleship.Data.Entities;
 using Battleship.Data.Models;
-using Battleship.Data.Models.ViewModels;
+using Battleship.Logic.ViewModels;
 using Battleship.Hubs;
 using Battleship.Hubs.Interfaces;
 using Battleship.Logic.Factories.Interfaces;
@@ -45,6 +45,7 @@ namespace Battleship.Tests.Controllers
             _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel());
             _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new GameListViewModel());
+            _gameFactory.Setup(s => s.CreateNewGame(It.IsAny<string>())).Returns(new Game());
 
             var result = await _gameController.Create(new CreateGameRequest());
 
