@@ -12,6 +12,8 @@ import { ShipApiService } from '../Services/ship-api-service';
 import { finalize } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { GameApiService } from '../Services/game-api-services';
+import { CoordinatesHelperService } from '../Services/coordinates-helper-service';
+import { UpdatedShipEventModel } from '../models/updated-ship-event-model';
 
 @Component({
   selector: 'app-get-setup',
@@ -19,7 +21,15 @@ import { GameApiService } from '../Services/game-api-services';
 })
 export class GameSetupComponent implements OnInit {
   public isLoading: boolean = false;
-  public currentGame: GameModel;
+  private _currentGame: GameModel;
+  public get currentGame() { return this._currentGame; }
+  public set currentGame(game: GameModel) {
+    this._currentGame = game;
+    if (this._currentGame) {
+      this.shipSelectList = this.convertShipsToSelectList(this._currentGame.ships);
+      this.shipCoordinates = this._currentGame.ships.reduce((coordinates, ship) => [...coordinates, ...ship.coordinates ], []);
+    }
+  }
   public selectedShipType: number;
   public shipSelectList: Array<IdNamePair>;
   public selectedOrientation: number;
@@ -27,8 +37,9 @@ export class GameSetupComponent implements OnInit {
     new IdNamePair (ShipOrientationType.HorizontalRight, 'Horizontal Right'),
     new IdNamePair (ShipOrientationType.VerticalDown, 'Vertical Down')
   ];
+  public shipCoordinates: Array<CoordinatesModel> = [];
   constructor(private gameStoreService: GameStoreService, private signalRService: SignalRService, private shipApiService: ShipApiService,
-    private route: ActivatedRoute, private gameApiService: GameApiService) {}
+    private route: ActivatedRoute, private gameApiService: GameApiService, private coordinatesHelperService: CoordinatesHelperService) {}
   ngOnInit(): void {
     this.currentGame = this.gameStoreService.currentGame;
     if (!this.currentGame) {
@@ -44,13 +55,10 @@ export class GameSetupComponent implements OnInit {
         if (data.success) {
           this.gameStoreService.currentGame = data.data;
           this.currentGame = data.data;
-          this.shipSelectList = this.convertShipsToSelectList(this.currentGame.ships);
         } else {
           alert(data.message);
         }
       })
-    } else {
-      this.shipSelectList = this.convertShipsToSelectList(this.currentGame.ships);
     }
 
     this.signalRService.addPlayerJoinedGameListener((joinedPlayer) => {
@@ -74,6 +82,8 @@ export class GameSetupComponent implements OnInit {
       return;
     }
 
+    const currentShipModel: ShipModel = this.currentGame.ships.find(x => x.shipType === parseInt(this.selectedShipType));
+
     const request = new UpdateShipPositionRequest(this.currentGame.gameId, this.currentGame.playerId, parseInt(this.selectedShipType.toString()),
                                                   coordinates, parseInt(this.selectedOrientation.toString()));
     this.isLoading = true;
@@ -83,8 +93,8 @@ export class GameSetupComponent implements OnInit {
     )
     .subscribe((data) => {
       if (data.success) {
-        this.gameStoreService.currentGame = data.data;
-        this.currentGame = data.data;
+        this.coordinatesHelperService.updatedShipEvent.emit(new UpdatedShipEventModel(currentShipModel, data.data));
+        Object.assign(this.currentGame.ships.find(x => x.shipType === data.data.shipType), data.data);
       } else {
         alert(data.message);
       }

@@ -50,7 +50,7 @@ export class HomeComponent implements OnInit{
     ).subscribe((result) => {
       if (result.success) {
         this.gameStoreService.currentGame = result.data;
-        this.router.navigate(['/game-setup']);
+        this.router.navigate([`/game-setup/${result.data.gameId}/${result.data.playerId}`]);
       } else {
         alert(result.message);
       }
