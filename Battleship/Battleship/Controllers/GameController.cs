@@ -83,5 +83,25 @@ namespace Battleship.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("get/{gameId}/{playerId}")]
+        public IActionResult Get(int gameId, int playerId)
+        {
+
+            Result<GameViewModel> result = new Result<GameViewModel>();
+            var gameResult = _gameDbService.GetById(gameId);
+            if (gameResult.Success)
+            {
+                result.Success = true;
+                result.Data = _gameFactory.GetGameViewModel(gameResult.Data, playerId);
+            }
+            else
+            {
+                result.Message = gameResult.Message;
+            }
+
+            return Ok(result);
+        }
     }
 }

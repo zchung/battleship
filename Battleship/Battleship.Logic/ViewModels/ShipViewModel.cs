@@ -1,5 +1,6 @@
 ﻿
 using Battleship.Logic.Enums;
+using System.Collections.Generic;
 
 namespace Battleship.Logic.ViewModels
 {
@@ -8,5 +9,10 @@ namespace Battleship.Logic.ViewModels
         public string Name { get; set; }
         public ShipType ShipType { get; set; }
         public int Size { get; set; }
+        public List<CoordinatesViewModel> Coordinates { get; set; }
+        public ShipViewModel()
+        {
+            Coordinates = new List<CoordinatesViewModel>();
+        }
     }
 }

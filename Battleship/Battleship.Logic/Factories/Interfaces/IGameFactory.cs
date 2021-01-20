@@ -7,7 +7,7 @@ namespace Battleship.Logic.Factories.Interfaces
     public interface IGameFactory
     {
         GameViewModel GetGameViewModel(Game game, int playerId);
-        GameListViewModel GetGameListViewModel(Game game);
+        List GetGameListViewModel(Game game);
         Game CreateNewGame(string description);
     }
 }

@@ -1,27 +1,31 @@
+<div class="spinner-border" *ngIf="isLoading"></div>
+<div *ngIf="currentGame">
+  <fieldset name="Game Setup Screen">
+    <p>
+      <label>Description: </label>
+      <span>{{currentGame.description}}</span>
+    </p>
+    <p>
+      <span>Welcome player {{currentGame.playerId}}</span>
+    </p>
+    <p>
+      Please select the ship you want to place, then select the orientation, then click on the part of the grid you want the start of the ship to be
+    </p>
+    <div class="row">
+      <div class="col-sm">
+        <label>Ship</label>
+        <select [(ngModel)]="selectedShipType">
+          <option *ngFor="let s of shipSelectList" [value]="s.id">{{s.name}}</option>
+        </select>
+      </div>
+      <div class="col-sm">
+        <label>Orientation</label>
+        <select [(ngModel)]="selectedOrientation">
+          <option *ngFor="let t of selectedOrientationList" [value]="t.id">{{t.name}}</option>
+        </select>
+      </div>
+    </div>
+  </fieldset>
+  <app-game-grid (cellSelectedEvent)="onCellSelectedEvent($event)"></app-game-grid>
+</div>
 
-<fieldset name="Game Setup Screen">
-  <p>
-    <label>Description: </label>
-    <span>{{currentGame.description}}</span>
-  </p>
-  <p>
-    <span>Welcome player {{currentGame.playerId}}</span>
-  </p>
-  <p>
-    Please select the ship you want to place, then select the orientation
-  </p>
-  <div class="row">
-    <div class="col-sm">
-      <label>Ship</label>
-      <select [(ngModel)]="selectedShipType">
-        <option *ngFor="let s of shipSelectList" value="s.id">{{s.name}}</option>
-      </select>
-    </div>
-    <div class="col-sm">
-      <label>Orientation</label>
-      <select [(ngModel)]="selectedOrientation">
-        <option *ngFor="let t of selectedOrientationList" value="t.id">{{t.name}}</option>
-      </select>
-    </div>
-  </div>
-</fieldset>
