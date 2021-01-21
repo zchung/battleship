@@ -17,5 +17,24 @@ namespace Battleship.Logic.ViewModels
         {
             return Ships.TrueForAll(s => s.IsPlaced());
         }
+        public bool AllShipsDestroyed()
+        {
+            return Ships.TrueForAll(x => x.IsDestroyed());
+        }
+        public bool AttackPlayer(CoordinatesViewModel coordinatesViewModel)
+        {
+            bool hit = false;
+            foreach (var ship in Ships)
+            {
+                CoordinatesViewModel matchingCoordinates = ship.FindCoordinatesInShip(coordinatesViewModel);
+                if (matchingCoordinates != null)
+                {
+                    matchingCoordinates.Hit = true;
+                    hit = true;
+                    break;
+                }
+            }
+            return hit;
+        }
     }
 }
