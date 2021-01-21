@@ -1,6 +1,7 @@
 ﻿
 using Battleship.Logic.Enums;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Battleship.Logic.ViewModels
 {
@@ -13,6 +14,20 @@ namespace Battleship.Logic.ViewModels
         public ShipViewModel()
         {
             Coordinates = new List<CoordinatesViewModel>();
+        }
+
+        public bool IsPlaced()
+        {
+            return Coordinates.Count == Size;
+        }
+
+        public bool IsDestroyed()
+        {
+            return Coordinates.TrueForAll(x => x.Hit);
+        }
+        public CoordinatesViewModel FindCoordinatesInShip(CoordinatesViewModel coordinatesViewModel)
+        {
+            return Coordinates.FirstOrDefault(x => x.XPosition == coordinatesViewModel.XPosition && x.YPosition == coordinatesViewModel.YPosition);
         }
     }
 }

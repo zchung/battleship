@@ -75,7 +75,7 @@ namespace Battleship.Controllers
                 result.Data = _gameFactory.GetGameViewModel(updateGameResult.Data, 2);
                 result.Success = updateGameResult.Success;
                 await _gameHubContext.Clients.All.RemoveGame(_gameFactory.GetGameListViewModel(updateGameResult.Data));
-                await _gameHubContext.Clients.All.SendPlayerHasJoined(new JoinedPlayer(result.Data.GameId, result.Data.PlayerId));
+                await _gameHubContext.Clients.All.SendPlayerHasJoined(new UpdatedPlayer(result.Data.GameId, result.Data.PlayerId));
             }
             else
             {
@@ -99,6 +99,18 @@ namespace Battleship.Controllers
             else
             {
                 result.Message = gameResult.Message;
+            }
+
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("setPlayerToPrepared")]
+        public async Task<IActionResult> SetPlayerToPrepared(GamePlayerRequest gamePlayerRequest)
+        {
+            var result = await _gameUpdateService.UpdatePlayerToPrepared(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId);
+            if (result.Success)
+            {
+                await _gameHubContext.Clients.All.SendPlayerIsPrepared(new UpdatedPlayer(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId));
             }
 
             return Ok(result);

@@ -8,5 +8,11 @@ namespace Battleship.Logic.Factories.Interfaces
     public interface ICoordinatesFactory
     {
         List<CoordinatesViewModel> GenerateNewCoordinates(CoordinatesViewModel startPosition, int size, ShipOrientationType shipOrientationType);
+
+        CoordinatesViewModel GetRandomCoordinate();
+
+        ShipOrientationType GetRandomOrientation();
+
+        List<CoordinatesViewModel> GenerateGameboard();
     }
 }

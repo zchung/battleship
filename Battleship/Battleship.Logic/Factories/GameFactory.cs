@@ -5,6 +5,7 @@ using Battleship.Logic.Factories.Interfaces;
 using Battleship.Data.Enums;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using Battleship.Logic.Enums;
 
 namespace Battleship.Logic.Factories
 {
@@ -26,14 +27,17 @@ namespace Battleship.Logic.Factories
 
         public GameViewModel GetGameViewModel(Game game, int playerId)
         {
-            return new GameViewModel
+            var gameViewModel =  new GameViewModel
             {
                 GameId = game.GameId,
                 Description = game.Description,
                 PlayerId = playerId,
-                Ships = playerId == 1 ? JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player1ShipsJSON) : JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player2ShipsJSON)
+                Ships = playerId == 1 ? JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player1ShipsJSON) : JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player2ShipsJSON),
+                Player1Status = game.Player1Status,
+                Player2Status = game.Player2Status
             };
 
+            return gameViewModel;
         }
 
         public Game CreateNewGame(string description)
@@ -43,7 +47,9 @@ namespace Battleship.Logic.Factories
                 Description = description,
                 GameStatus = GameStatus.Active,
                 Player1ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips()),
-                Player2ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips())
+                Player2ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips()),
+                Player1Status = PlayerStatus.Preparing,
+                Player2Status = PlayerStatus.Empty
             };
         }
     }
