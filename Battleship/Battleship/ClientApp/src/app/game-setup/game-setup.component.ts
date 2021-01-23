@@ -14,6 +14,10 @@ import { ActivatedRoute } from '@angular/router';
 import { GameApiService } from '../Services/game-api-services';
 import { CoordinatesHelperService } from '../Services/coordinates-helper-service';
 import { UpdatedShipEventModel } from '../models/updated-ship-event-model';
+import { GamePlayerRequest } from '../models/requests/game-player-request';
+import { PlayerStatus } from '../models/enums/player-status';
+import { PlayerFactory } from '../factories/player-factory';
+import { IPlayer } from '../models/interfaces/player-interface';
 
 @Component({
   selector: 'app-get-setup',
@@ -22,12 +26,16 @@ import { UpdatedShipEventModel } from '../models/updated-ship-event-model';
 export class GameSetupComponent implements OnInit {
   public isLoading: boolean = false;
   private _currentGame: GameModel;
+  private thisPlayer: IPlayer;
+  private otherPlayer: IPlayer;
   public get currentGame() { return this._currentGame; }
   public set currentGame(game: GameModel) {
     this._currentGame = game;
     if (this._currentGame) {
       this.shipSelectList = this.convertShipsToSelectList(this._currentGame.ships);
       this.shipCoordinates = this._currentGame.ships.reduce((coordinates, ship) => [...coordinates, ...ship.coordinates ], []);
+      this.otherPlayer = this.playerFactory.getOtherPlayerFromGame(this._currentGame.playerId, this._currentGame);
+      this.thisPlayer = this.playerFactory.getThisPlayerFromGame(this._currentGame.playerId, this._currentGame);
     }
   }
   public selectedShipType: number;
@@ -39,7 +47,8 @@ export class GameSetupComponent implements OnInit {
   ];
   public shipCoordinates: Array<CoordinatesModel> = [];
   constructor(private gameStoreService: GameStoreService, private signalRService: SignalRService, private shipApiService: ShipApiService,
-    private route: ActivatedRoute, private gameApiService: GameApiService, private coordinatesHelperService: CoordinatesHelperService) {}
+    private route: ActivatedRoute, private gameApiService: GameApiService, private coordinatesHelperService: CoordinatesHelperService,
+    private playerFactory: PlayerFactory) {}
   ngOnInit(): void {
     this.currentGame = this.gameStoreService.currentGame;
     if (!this.currentGame) {
@@ -62,10 +71,18 @@ export class GameSetupComponent implements OnInit {
     }
 
     this.signalRService.addPlayerJoinedGameListener((joinedPlayer) => {
-      if (this.currentGame.gameId === joinedPlayer.gameId) {
-        alert(`Player ${joinedPlayer.playerId} has joined the game`);
+      if (this.currentGame.gameId === joinedPlayer.gameId &&
+        this.currentGame.playerId !== joinedPlayer.playerId) {
+        this.otherPlayer.setPlayerStatus(this.currentGame, PlayerStatus.Preparing);
       }
     });
+
+    this.signalRService.addPlayerIsReadyGameListener((updatedPlayer) => {
+      if (this.currentGame.gameId === updatedPlayer.gameId &&
+        this.currentGame.playerId !== updatedPlayer.playerId) {
+        this.otherPlayer.setPlayerStatus(this.currentGame, PlayerStatus.Ready);
+      }
+    })
   }
 
   public convertShipsToSelectList(ships: Array<ShipModel>): Array<IdNamePair> {
@@ -84,7 +101,8 @@ export class GameSetupComponent implements OnInit {
 
     const currentShipModel: ShipModel = this.currentGame.ships.find(x => x.shipType === parseInt(this.selectedShipType.toString()));
 
-    const request = new UpdateShipPositionRequest(this.currentGame.gameId, this.currentGame.playerId, parseInt(this.selectedShipType.toString()),
+    const request = new UpdateShipPositionRequest(this.currentGame.gameId, this.currentGame.playerId,
+                                                  parseInt(this.selectedShipType.toString()),
                                                   coordinates, parseInt(this.selectedOrientation.toString()));
     this.isLoading = true;
     this.shipApiService.updateShipPosition(request)
@@ -99,5 +117,20 @@ export class GameSetupComponent implements OnInit {
         alert(data.message);
       }
     });
+  }
+
+
+  public onReadyClick(): void {
+    this.isLoading = true;
+    this.gameApiService.setGameToReady(new GamePlayerRequest(this.currentGame.gameId, this.currentGame.playerId))
+      .pipe(
+        finalize(() => this.isLoading = false)
+      ).subscribe((data) => {
+        if (data.success) {
+          this.thisPlayer.setPlayerStatus(this.currentGame, PlayerStatus.Ready);
+        } else {
+          alert(data.message);
+        }
+      });
   }
 }

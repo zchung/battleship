@@ -6,7 +6,6 @@ namespace Battleship.Data.Enums
     {
         Empty = 0,
         Preparing = 1,
-        Prepared = 2,
-        Ready = 3
+        Ready = 2
     }
 }

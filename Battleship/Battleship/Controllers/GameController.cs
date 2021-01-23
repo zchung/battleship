@@ -104,13 +104,13 @@ namespace Battleship.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("setPlayerToPrepared")]
-        public async Task<IActionResult> SetPlayerToPrepared(GamePlayerRequest gamePlayerRequest)
+        [Route("setPlayerToReady")]
+        public async Task<IActionResult> SetPlayerToReady(GamePlayerRequest gamePlayerRequest)
         {
-            var result = await _gameUpdateService.UpdatePlayerToPrepared(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId);
+            var result = await _gameUpdateService.UpdatePlayerToReady(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId);
             if (result.Success)
             {
-                await _gameHubContext.Clients.All.SendPlayerIsPrepared(new UpdatedPlayer(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId));
+                await _gameHubContext.Clients.All.SendPlayerIsReady(new UpdatedPlayer(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId));
             }
 
             return Ok(result);

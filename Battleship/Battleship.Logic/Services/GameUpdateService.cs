@@ -35,7 +35,7 @@ namespace Battleship.Logic.Services
             return gameResult;
         }
 
-        public async Task<Result> UpdatePlayerToPrepared(int gameId, int playerId)
+        public async Task<Result> UpdatePlayerToReady(int gameId, int playerId)
         {
             Result result = new Result();
             Result<Game> gameResult = _gameDbService.GetById(gameId);
@@ -46,11 +46,11 @@ namespace Battleship.Logic.Services
                 {
                     if (playerId == 1)
                     {
-                        gameResult.Data.Player1Status = PlayerStatus.Prepared;
+                        gameResult.Data.Player1Status = PlayerStatus.Ready;
                     }
                     else
                     {
-                        gameResult.Data.Player2Status = PlayerStatus.Prepared;
+                        gameResult.Data.Player2Status = PlayerStatus.Ready;
                     }
                     var saveResult = await _gameDbService.SaveChangesAsync();
                     if (saveResult.Success)

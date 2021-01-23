@@ -25,6 +25,17 @@
         </select>
       </div>
     </div>
+    <div class="row">
+      <div class="col-sm">
+        Player 1: {{currentGame.player1Status | playerStatusText}}
+      </div>
+      <div class="col-sm">
+        Player 2: {{currentGame.player2Status | playerStatusText}}
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn btn-success col-sm" (click)="onReadyClick()">I'm Ready</button>
+    </div>
   </fieldset>
   <app-game-grid (cellSelectedEvent)="onCellSelectedEvent($event)" [shipCoordinates]="shipCoordinates"></app-game-grid>
 </div>

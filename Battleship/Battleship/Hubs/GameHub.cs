@@ -23,9 +23,9 @@ namespace Battleship.Hubs
             await Clients.All.SendPlayerHasJoined(updatedPlayer);
         }
 
-        public async Task SendPlayerIdPrepared(UpdatedPlayer updatedPlayer)
+        public async Task SendPlayerIdReady(UpdatedPlayer updatedPlayer)
         {
-            await Clients.All.SendPlayerIsPrepared(updatedPlayer);
+            await Clients.All.SendPlayerIsReady(updatedPlayer);
         }
     }
 }

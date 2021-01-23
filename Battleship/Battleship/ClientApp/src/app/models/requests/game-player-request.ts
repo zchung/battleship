@@ -1,4 +1,6 @@
 export class GamePlayerRequest {
-  gameId: number;
-  playerId: number;
+  constructor(
+    public gameId: number,
+    public playerId: number
+  ) {}
 }

@@ -12,6 +12,7 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { GameSetupComponent } from './game-setup/game-setup.component';
 import { GameGridComponent } from './game-grid/game-grid.component';
 import { CellStylePipe } from './pipes/cell-style-pipe';
+import { PlayerStatusTextPipe } from './pipes/player-status-text-pipe';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { CellStylePipe } from './pipes/cell-style-pipe';
     FetchDataComponent,
     GameSetupComponent,
     GameGridComponent,
-    CellStylePipe
+    CellStylePipe,
+    PlayerStatusTextPipe
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

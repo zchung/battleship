@@ -8,6 +8,6 @@ namespace Battleship.Logic.Services.Interfaces
     public interface IGameUpdateService
     {
         Task<Result<Game>> UpdateGameAfterPlayerJoins(int gameId);
-        Task<Result> UpdatePlayerToPrepared(int gameId, int playerId);
+        Task<Result> UpdatePlayerToReady(int gameId, int playerId);
     }
 }

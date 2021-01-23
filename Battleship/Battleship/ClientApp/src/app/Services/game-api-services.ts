@@ -33,7 +33,7 @@ export class GameApiService {
     return this.http.get<Result<GameModel>>(`${this.baseUrl}get/${gameId}/${playerId}`);
   }
 
-  setGameToPrepared(gamePlayerRequest: GamePlayerRequest): Observable<result.Result> {
-    return this.http.post<result.Result>(`${this.baseUrl}setPlayerToPrepared`, gamePlayerRequest);
+  setGameToReady(gamePlayerRequest: GamePlayerRequest): Observable<result.Result> {
+    return this.http.post<result.Result>(`${this.baseUrl}setPlayerToReady`, gamePlayerRequest);
   }
 }

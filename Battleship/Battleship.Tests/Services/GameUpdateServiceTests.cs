@@ -41,7 +41,7 @@ namespace Battleship.Tests.Services
         }
 
         [TestMethod]
-        public async Task UpdatePlayerToPrepared_Should_Update_The_Status_If_The_Condition_Is_Met()
+        public async Task UpdatePlayerToReady_Should_Update_The_Status_If_The_Condition_Is_Met()
         {
             _gameDbService.Setup(s => s.GetById(1)).Returns(new Result<Game> { Data = new Game(), Success = true });
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel 
@@ -61,7 +61,7 @@ namespace Battleship.Tests.Services
             });
             _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
 
-            var result = await _gameUpdateService.UpdatePlayerToPrepared(1, 1);
+            var result = await _gameUpdateService.UpdatePlayerToReady(1, 1);
 
             _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
 
@@ -88,7 +88,7 @@ namespace Battleship.Tests.Services
             });
             _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
 
-            var result = await _gameUpdateService.UpdatePlayerToPrepared(1, 1);
+            var result = await _gameUpdateService.UpdatePlayerToReady(1, 1);
 
             _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Never);
 

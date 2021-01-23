@@ -42,6 +42,14 @@ private baseUrl: string;
       if (callBack) {
         callBack(data);
       }
-    })
+    });
+  }
+
+  public addPlayerIsReadyGameListener = (callBack: (updatedPlayer: UpdatedPlayer) => void) => {
+    this.hubConnection.on('sendplayerisready', (data) => {
+      if (callBack) {
+        callBack(data);
+      }
+    });
   }
 }
