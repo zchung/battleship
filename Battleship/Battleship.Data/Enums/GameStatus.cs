@@ -3,8 +3,8 @@ namespace Battleship.Data.Enums
 {
     public enum GameStatus
     {
-        Started = 0,
+        Planning = 0,
         Active = 1,
-        Completed = 2
+        Started = 2
     }
 }

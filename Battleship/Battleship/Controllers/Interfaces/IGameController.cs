@@ -13,5 +13,6 @@ namespace Battleship.Controllers.Interfaces
         Task<IActionResult> Join(JoinGameRequest joinGameRequest);
         IActionResult Get(int gameId, int playerId);
         Task<IActionResult> SetPlayerToReady(GamePlayerRequest gamePlayerRequest);
+        Task<IActionResult> SetGameStatus(SetGameStatusRequest request);
     }
 }
