@@ -10,5 +10,7 @@ namespace Battleship.Hubs.Interfaces
         Task RemoveGame(List game);
         Task SendPlayerHasJoined(UpdatedPlayer updatedPlayer);
         Task SendPlayerIsReady(UpdatedPlayer updatedPlayer);
+        Task SendBothPlayersReady(UpdatedGame updatedGame);
+        Task SendGameHasStarted(UpdatedGame updatedGame);
     }
 }

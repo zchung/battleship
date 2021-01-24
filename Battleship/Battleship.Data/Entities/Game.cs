@@ -14,5 +14,11 @@ namespace Battleship.Data.Entities
         public string Player2ShipsJSON { get; set; }
         public PlayerStatus Player1Status { get; set; }
         public PlayerStatus Player2Status { get; set; }
+
+        [NotMapped]
+        public bool BothPlayersReady 
+        {
+            get { return Player1Status.Equals(PlayerStatus.Ready) && Player2Status.Equals(PlayerStatus.Ready); }
+        }
     }
 }

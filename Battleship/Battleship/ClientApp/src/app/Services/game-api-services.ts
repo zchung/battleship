@@ -8,6 +8,8 @@ import { GameModel } from '../models/game-model';
 import { GameListModel } from '../models/game-list-model';
 import { JoinGameRequest } from '../models/requests/join-game-request';
 import { GamePlayerRequest } from '../models/requests/game-player-request';
+import { SetGameStatusRequest } from '../models/requests/set-game-status-request';
+import { UpdatedGame } from '../models/updated-game-model';
 @Injectable({
   providedIn: 'root'
 })
@@ -35,5 +37,9 @@ export class GameApiService {
 
   setGameToReady(gamePlayerRequest: GamePlayerRequest): Observable<result.Result> {
     return this.http.post<result.Result>(`${this.baseUrl}setPlayerToReady`, gamePlayerRequest);
+  }
+
+  setGameStatus(setGameStatusRequest: SetGameStatusRequest): Observable<result.Result> {
+    return this.http.post<result.Result>(`${this.baseUrl}setgamestatus`, setGameStatusRequest);
   }
 }

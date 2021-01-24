@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import { GameModel } from '../models/game-model';
 import { UpdatedPlayer } from '../models/updated-player';
+import { UpdatedGame } from '../models/updated-game-model';
 
 @Injectable({
   providedIn: 'root'
@@ -51,5 +52,13 @@ private baseUrl: string;
         callBack(data);
       }
     });
+  }
+
+  public addUpdatedGameStatusListener = (callBack: (updatedGame: UpdatedGame) => void) => {
+    this.hubConnection.on('setgamestatus', (data) => {
+      if (callBack) {
+        callBack(data);
+      }
+    })
   }
 }

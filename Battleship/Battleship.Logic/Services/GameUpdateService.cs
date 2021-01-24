@@ -22,7 +22,7 @@ namespace Battleship.Logic.Services
 
             if (gameResult.Data != null && gameResult.Success)
             {
-                gameResult.Data.GameStatus = GameStatus.Started;
+                gameResult.Data.GameStatus = GameStatus.Planning;
                 gameResult.Data.Player2Status = PlayerStatus.Preparing;
                 await _gameDbService.SaveChangesAsync();
                 gameResult.Success = true;
@@ -35,15 +35,41 @@ namespace Battleship.Logic.Services
             return gameResult;
         }
 
-        public async Task<Result> UpdatePlayerToReady(int gameId, int playerId)
+        public async Task<Result> UpdateGameStatus(int gameId, GameStatus status)
         {
             Result result = new Result();
+
+            Result<Game> gameResult = _gameDbService.GetById(gameId);
+            if (gameResult.Success)
+            {
+                gameResult.Data.GameStatus = status;
+                var saveResult = await _gameDbService.SaveChangesAsync();
+                if (saveResult.Success)
+                {
+                    result.Success = true;
+                }
+                else
+                {
+                    result.Message = saveResult.Message;
+                }
+            }
+            else
+            {
+                result.Message = gameResult.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<Result<Game>> UpdatePlayerToReady(int gameId, int playerId)
+        {
             Result<Game> gameResult = _gameDbService.GetById(gameId);
             if (gameResult.Data != null && gameResult.Success)
             {
                 var gameViewModel = _gameFactory.GetGameViewModel(gameResult.Data, playerId);
                 if (gameViewModel.AllShipsPlaced())
                 {
+                     
                     if (playerId == 1)
                     {
                         gameResult.Data.Player1Status = PlayerStatus.Ready;
@@ -55,24 +81,21 @@ namespace Battleship.Logic.Services
                     var saveResult = await _gameDbService.SaveChangesAsync();
                     if (saveResult.Success)
                     {
-                        result.Success = true;
+                        gameResult.Success = true;
                     }
                     else
                     {
-                        result.Message = "Unable to update Status";
+                        gameResult.Message = "Unable to update Status";
                     }
                 }
                 else
                 {
-                    result.Message = "You must place all ships before you are prepared.";
+                    gameResult.Success = false;
+                    gameResult.Message = "You must place all ships before you are prepared.";
                 }
             }
-            else
-            {
-                gameResult.Message = "Unable to get game.";
-            }
 
-            return result;
+            return gameResult;
         }
     }
 }

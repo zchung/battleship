@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Battleship.Data.Enums;
 
 namespace Battleship.Tests.Controllers
 {    
@@ -32,8 +33,10 @@ namespace Battleship.Tests.Controllers
         {
             _gameDbService = new Mock<IGameDbService>();
             _gameFactory = new Mock<IGameFactory>();
-            _gameUpdateService = new Mock<IGameUpdateService>();
+            _gameUpdateService = new Mock<IGameUpdateService>();            
             _gameHubContext = new Mock<IHubContext<GameHub, IGameHub>>();
+            var gameHub = new Mock<IGameHub>();
+            _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
             _gameController = new GameController(_gameDbService.Object, _gameFactory.Object, _gameUpdateService.Object, _gameHubContext.Object);
         }
 
@@ -41,8 +44,6 @@ namespace Battleship.Tests.Controllers
         public async Task Create_Should_Return_The_Result()
         {
             _gameDbService.Setup(s => s.Create(It.IsAny<Game>())).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true });
-            var gameHub = new Mock<IGameHub>();
-            _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel());
             _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
             _gameFactory.Setup(s => s.CreateNewGame(It.IsAny<string>())).Returns(new Game());
@@ -72,8 +73,6 @@ namespace Battleship.Tests.Controllers
             _gameUpdateService.Setup(s => s.UpdateGameAfterPlayerJoins(1)).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true });
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 2)).Returns(new GameViewModel());
             _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
-            var gameHub = new Mock<IGameHub>();
-            _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
 
             var result = await _gameController.Join(new JoinGameRequest { GameId = 1 });
 
@@ -112,13 +111,22 @@ namespace Battleship.Tests.Controllers
         [TestMethod]
         public async Task SetGameToPrepared_Should_Return_The_Result()
         {
-            _gameUpdateService.Setup(s => s.UpdatePlayerToReady(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(new Result { Success = true});
-            var gameHub = new Mock<IGameHub>();
-            _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
+            _gameUpdateService.Setup(s => s.UpdatePlayerToReady(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true});
 
             var result = await _gameController.SetPlayerToReady(new GamePlayerRequest { GameId = 1, PlayerId = 1 });
 
             _gameHubContext.Verify(v => v.Clients.All.SendPlayerIsReady(It.IsAny<UpdatedPlayer>()), Times.Once);
+
+            var castResult = ValidateOkResult<Result>(result);
+            Assert.IsTrue(castResult.Success);
+        }
+
+        [TestMethod]
+        public async Task SetGameStatus_Should_Return_The_Result()
+        {
+            _gameUpdateService.Setup(s => s.UpdateGameStatus(It.IsAny<int>(), It.IsAny<GameStatus>())).ReturnsAsync(new Result { Success = true });
+
+            var result = await _gameController.SetGameStatus(new SetGameStatusRequest { GameId = 1, GameStatus = GameStatus.Started });
 
             var castResult = ValidateOkResult<Result>(result);
             Assert.IsTrue(castResult.Success);

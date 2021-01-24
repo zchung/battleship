@@ -36,6 +36,11 @@
     <div class="row">
       <button class="btn btn-success col-sm" (click)="onReadyClick()">I'm Ready</button>
     </div>
+    <div class="row">
+      <button class="btn btn-danger col-sm" (click)="onGameStartClick()" [disabled]="!currentGame.gameReadyToStart && !gameIsStarting">Start Game</button>
+    </div>
+    <div class="row" *ngIf="gameIsStarting">
+      <span class="alert alert-info">Game staring in....{{secondsTillStart}}</span></div>
   </fieldset>
   <app-game-grid (cellSelectedEvent)="onCellSelectedEvent($event)" [shipCoordinates]="shipCoordinates"></app-game-grid>
 </div>

@@ -36,7 +36,7 @@ namespace Battleship.Tests.Services
 
             Assert.IsTrue(result.Success);
             Assert.IsNotNull(result.Data);
-            Assert.AreEqual(GameStatus.Started, result.Data.GameStatus);
+            Assert.AreEqual(GameStatus.Planning, result.Data.GameStatus);
             Assert.AreEqual(PlayerStatus.Preparing, result.Data.Player2Status);
         }
 
@@ -66,6 +66,7 @@ namespace Battleship.Tests.Services
             _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
 
             Assert.IsTrue(result.Success);
+            Assert.IsNotNull(result.Data);
         }
 
         [TestMethod]
@@ -94,6 +95,22 @@ namespace Battleship.Tests.Services
 
             Assert.IsFalse(result.Success);
             Assert.IsNotNull(result.Message);
+        }
+
+        [TestMethod]
+        public async Task UpdateGameStatus_Should_Correctly_Update_The_Status()
+        {
+            Game game = new Game();
+            GameStatus gameStatus = GameStatus.Started;
+            _gameDbService.Setup(s => s.GetById(It.IsAny<int>())).Returns(new Result<Game> { Data = game, Success = true });
+            _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
+
+            var result = await _gameUpdateService.UpdateGameStatus(1, gameStatus);
+
+            _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(gameStatus, game.GameStatus);
         }
     }
 }

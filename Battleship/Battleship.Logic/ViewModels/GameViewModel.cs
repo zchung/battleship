@@ -13,6 +13,12 @@ namespace Battleship.Logic.ViewModels
         public List<ShipViewModel> Ships { get; set; }
         public PlayerStatus Player1Status { get; set; }
         public PlayerStatus Player2Status { get; set; }
+        public bool GameReadyToStart { 
+            get
+            {
+                return Player1Status == PlayerStatus.Ready && Player2Status == PlayerStatus.Ready;
+            }
+        }
         public bool AllShipsPlaced()
         {
             return Ships.TrueForAll(s => s.IsPlaced());

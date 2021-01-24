@@ -7,4 +7,5 @@ export class GameModel {
   ships: Array<ShipModel>;
   player1Status: PlayerStatus;
   player2Status: PlayerStatus;
+  gameReadyToStart: boolean;
 }

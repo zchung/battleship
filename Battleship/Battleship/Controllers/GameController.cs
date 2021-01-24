@@ -75,7 +75,7 @@ namespace Battleship.Controllers
                 result.Data = _gameFactory.GetGameViewModel(updateGameResult.Data, 2);
                 result.Success = updateGameResult.Success;
                 await _gameHubContext.Clients.All.RemoveGame(_gameFactory.GetGameListViewModel(updateGameResult.Data));
-                await _gameHubContext.Clients.All.SendPlayerHasJoined(new UpdatedPlayer(result.Data.GameId, result.Data.PlayerId));
+                await _gameHubContext.Clients.All.SendPlayerHasJoined(new UpdatedPlayer(result.Data.GameId, result.Data.PlayerId, updateGameResult.Data.BothPlayersReady));
             }
             else
             {
@@ -110,7 +110,21 @@ namespace Battleship.Controllers
             var result = await _gameUpdateService.UpdatePlayerToReady(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId);
             if (result.Success)
             {
-                await _gameHubContext.Clients.All.SendPlayerIsReady(new UpdatedPlayer(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId));
+                await _gameHubContext.Clients.All.SendPlayerIsReady(new UpdatedPlayer(gamePlayerRequest.GameId, gamePlayerRequest.PlayerId, result.Data.BothPlayersReady));
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("setGameStatus")]
+        public async Task<IActionResult> SetGameStatus(SetGameStatusRequest request)
+        {
+            var result = await _gameUpdateService.UpdateGameStatus(request.GameId, request.GameStatus);
+
+            if (result.Success)
+            {
+                await _gameHubContext.Clients.All.SendGameHasStarted(new UpdatedGame(request.GameId));
             }
 
             return Ok(result);

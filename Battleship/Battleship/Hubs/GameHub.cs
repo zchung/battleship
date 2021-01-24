@@ -27,5 +27,15 @@ namespace Battleship.Hubs
         {
             await Clients.All.SendPlayerIsReady(updatedPlayer);
         }
+
+        public async Task SendBothPlayersReady(UpdatedGame updatedGame)
+        {
+            await Clients.All.SendBothPlayersReady(updatedGame);
+        }
+
+        public async Task SendGameHasStarted(UpdatedGame updatedGame)
+        {
+            await Clients.All.SendGameHasStarted(updatedGame);
+        }
     }
 }

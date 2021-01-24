@@ -13,6 +13,7 @@ import { GameSetupComponent } from './game-setup/game-setup.component';
 import { GameGridComponent } from './game-grid/game-grid.component';
 import { CellStylePipe } from './pipes/cell-style-pipe';
 import { PlayerStatusTextPipe } from './pipes/player-status-text-pipe';
+import { GamePlayAreaComponent } from './game-play-area/game-play-area.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { PlayerStatusTextPipe } from './pipes/player-status-text-pipe';
     FetchDataComponent,
     GameSetupComponent,
     GameGridComponent,
+    GamePlayAreaComponent,
     CellStylePipe,
     PlayerStatusTextPipe
   ],
@@ -34,7 +36,8 @@ import { PlayerStatusTextPipe } from './pipes/player-status-text-pipe';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
-      { path: 'game-setup/:gameId/:playerId', component: GameSetupComponent }
+      { path: 'game-setup/:gameId/:playerId', component: GameSetupComponent },
+      { path: 'game-play-area/:gameId/:playerId', component: GamePlayAreaComponent }
     ])
   ],
   providers: [],
