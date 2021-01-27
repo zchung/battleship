@@ -3,8 +3,11 @@ using Battleship.Data.Entities;
 using Battleship.Data.Enums;
 using Battleship.Logic.Factories;
 using Battleship.Logic.Factories.Interfaces;
+using Battleship.Logic.InternalModels;
+using Battleship.Logic.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Battleship.Tests.Factories
 {
@@ -12,13 +15,17 @@ namespace Battleship.Tests.Factories
     public class GameFactoryTests
     {
         private IShipFactory _shipFactory;
+        private IRandomGeneratorFactory _randomGeneratorFactory;
         private IGameFactory _gameFactory;
+        private IPlayerFactory _playerFactory;
 
         [TestInitialize]
         public void Initialise()
         {
             _shipFactory = new ShipFactory(); // Not mocking because the values from here are static.
-            _gameFactory = new GameFactory(_shipFactory);
+            _randomGeneratorFactory = new RandomGeneratorFactory();
+            _playerFactory = new PlayerFactory();
+            _gameFactory = new GameFactory(_shipFactory, _randomGeneratorFactory, _playerFactory);
         }
 
         [TestMethod]
@@ -29,7 +36,9 @@ namespace Battleship.Tests.Factories
                 GameId = 1,
                 Description = "test game",
                 Player1ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips()),
-                Player2ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips())
+                Player2ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips()),
+                Player1AttemptedCoordinatesJSON = JsonConvert.SerializeObject(new List<CoordinatesViewModel> { new CoordinatesViewModel()}),
+                Player2AttemptedCoordinatesJSON = JsonConvert.SerializeObject(new List<CoordinatesViewModel> { new CoordinatesViewModel()})
             };
             var result = _gameFactory.GetGameViewModel(game, 1);
 
@@ -70,6 +79,18 @@ namespace Battleship.Tests.Factories
             Assert.AreEqual(description, result.Description);
             Assert.IsNotNull(result.Player1ShipsJSON);
             Assert.IsNotNull(result.Player2ShipsJSON);
+        }
+
+        [TestMethod]
+        public void GetGameType_Should_Return_The_Type()
+        {
+            var result = _gameFactory.GetGameType(new Game(), GameStatus.Planning);
+
+            Assert.IsInstanceOfType(result, typeof(PlanningGame));
+
+            result = _gameFactory.GetGameType(new Game(), GameStatus.Started);
+
+            Assert.IsInstanceOfType(result, typeof(StartedGame));
         }
     }
 }

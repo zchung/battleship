@@ -23,7 +23,7 @@ namespace Battleship.Logic.ViewModels
 
         public bool IsDestroyed()
         {
-            return Coordinates.TrueForAll(x => x.Hit);
+            return Coordinates.TrueForAll(x => x.Hit.HasValue && x.Hit.Value);
         }
         public CoordinatesViewModel FindCoordinatesInShip(CoordinatesViewModel coordinatesViewModel)
         {

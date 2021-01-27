@@ -35,7 +35,9 @@ namespace Battleship.Console
         private static string PlayGame(Random rnd)
         {
             IShipFactory _shipFactory = new ShipFactory();
-            IGameFactory _gameFactory = new GameFactory(_shipFactory);
+            IRandomGeneratorFactory _randomGeneratorFactory = new RandomGeneratorFactory();
+            IPlayerFactory _playerFactory = new PlayerFactory();
+            IGameFactory _gameFactory = new GameFactory(_shipFactory, _randomGeneratorFactory, _playerFactory);
             ICoordinatesFactory _coordinatesFactory = new CoordinatesFactory();
             ICoordinatesValidationService _coordinatesValidationService = new CoordinatesValidationService();
             ICoordinatesUpdateService _coordinatesUpdateService = new CoordinatesUpdateService(_coordinatesFactory, _coordinatesValidationService);

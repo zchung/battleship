@@ -89,8 +89,13 @@ export class GameSetupComponent implements OnInit, OnDestroy {
           this.otherPlayer.setPlayerStatus(this.currentGame, PlayerStatus.Ready);
         }
         this.currentGame.gameReadyToStart = updatedPlayer.bothPlayersReady;
-        if (this.currentGame.gameReadyToStart) {
-          this.gameIsStarting = true;
+      }
+    });
+
+    this.signalRService.addUpdatedGameStatusListener((updatedGame) => {
+      if (this.currentGame.gameId === updatedGame.gameId) {
+        this.gameIsStarting = true;
+        this.gameStoreService.currentGame.currentPlayerIdTurn = updatedGame.currentPlayerIdTurn;
         interval(1000).pipe(
           takeUntil(this.unsubscribe))
         .subscribe(() => {
@@ -99,13 +104,6 @@ export class GameSetupComponent implements OnInit, OnDestroy {
             this.router.navigate([`/game-play-area/${this.currentGame.gameId}/${this.currentGame.playerId}`]);
           }
         });
-        }
-      }
-    });
-
-    this.signalRService.addUpdatedGameStatusListener((updatedGame) => {
-      if (this.currentGame.gameId === updatedGame.gameId) {
-        this.currentGame.gameReadyToStart = true;
       }
     });
   }

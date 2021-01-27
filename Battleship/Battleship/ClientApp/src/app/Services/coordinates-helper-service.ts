@@ -5,6 +5,7 @@ import { RowModel } from '../models/row-model';
 import { CellType } from '../models/enums/cell-type';
 import { ShipModel } from '../models/ship-model';
 import { UpdatedShipEventModel } from '../models/updated-ship-event-model';
+import { SetNewCoordinatesEvent } from '../models/set-new-coordinates-event';
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +31,17 @@ export class CoordinatesHelperService {
 
   public setCellTypeByShip(rows: Array<RowModel>, shipModel: ShipModel, cellType: CellType): void {
     this.setCellTypeInRows(rows, shipModel.coordinates, cellType);
+  }
+
+  public getCellType(hit: boolean): CellType {
+    switch (hit) {
+      case true:
+        return CellType.Hit;
+      case false:
+        return CellType.Miss;
+      default:
+        return CellType.HasShip;
+    }
+
   }
 }

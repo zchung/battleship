@@ -1,3 +1,4 @@
 export class UpdatedGame {
-  gameId: Number;
+  gameId: number;
+  currentPlayerIdTurn: number;
 }

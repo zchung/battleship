@@ -24,14 +24,17 @@ namespace Battleship.Controllers
         private readonly IGameFactory _gameFactory;
         private readonly IGameUpdateService _gameUpdateService;
         private readonly IHubContext<GameHub, IGameHub> _gameHubContext;
+        private readonly IGameValidationService _gameValidationService;
 
         public GameController(IGameDbService gameDbService, IGameFactory gameFactory, 
-                              IGameUpdateService gameUpdateService, IHubContext<GameHub, IGameHub> gameHubContext)
+                              IGameUpdateService gameUpdateService, IHubContext<GameHub, IGameHub> gameHubContext,
+                              IGameValidationService gameValidationService)
         {
             _gameDbService = gameDbService;
             _gameFactory = gameFactory;
             _gameUpdateService = gameUpdateService;
             _gameHubContext = gameHubContext;
+            _gameValidationService = gameValidationService;
         }
 
         [HttpPost]
@@ -124,8 +127,33 @@ namespace Battleship.Controllers
 
             if (result.Success)
             {
-                await _gameHubContext.Clients.All.SendGameHasStarted(new UpdatedGame(request.GameId));
+                await _gameHubContext.Clients.All.SendUpdateGameStatus(new UpdatedGame(request.GameId, result.Data.CurrentPlayerIdTurn));
             }
+
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("attackPlayer")]
+        public async Task<IActionResult> AttackPlayer(AttackPlayerRequest request)
+        {
+            var validationResult = _gameValidationService.CanAttackPlayer(request.GameId, request.PlayerIdAttacking);
+            if (!validationResult.Success)
+            {
+                return Ok(validationResult);
+            }
+
+            var result = await _gameUpdateService.ResolvePlayerAttack(request.GameId, request.PlayerIdAttacking, 
+                                                                      request.PlayerIdToAttack, request.CoordinatesViewModel);
+
+            if (result.Success)
+            {
+                await _gameHubContext.Clients.All.SendAttackPlayerCoordinates(
+                    new AttackingPlayerResult(request.GameId, request.PlayerIdAttacking, 
+                                              request.PlayerIdToAttack, result.Data, result.Success,
+                                              result.Message)
+                    );
+            }
+
 
             return Ok(result);
         }

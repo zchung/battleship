@@ -8,6 +8,10 @@ export class CellStylePipe implements PipeTransform {
         return 'empty';
       case CellType.HasShip:
         return 'ship';
+      case CellType.Miss:
+        return 'miss';
+      case CellType.Hit:
+        return 'hit';
       default:
         return '';
     }

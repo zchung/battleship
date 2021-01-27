@@ -3,6 +3,7 @@ using Battleship.Hubs.Interfaces;
 using Battleship.Models.Hub;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using Battleship.Data.Models;
 
 namespace Battleship.Hubs
 {
@@ -33,9 +34,14 @@ namespace Battleship.Hubs
             await Clients.All.SendBothPlayersReady(updatedGame);
         }
 
-        public async Task SendGameHasStarted(UpdatedGame updatedGame)
+        public async Task SendUpdateGameStatus(UpdatedGame updatedGame)
         {
-            await Clients.All.SendGameHasStarted(updatedGame);
+            await Clients.All.SendUpdateGameStatus(updatedGame);
+        }
+
+        public async Task SendAttackPlayerCoordinates(AttackingPlayerResult attackingPlayerResult)
+        {
+            await Clients.All.SendAttackPlayerCoordinates(attackingPlayerResult);
         }
     }
 }

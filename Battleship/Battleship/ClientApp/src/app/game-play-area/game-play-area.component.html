@@ -1,1 +1,19 @@
 <div>Play area.</div>
+<div class="spinner-border" *ngIf="isLoading"></div>
+<div *ngIf="currentGame">
+  <div class="row">
+    <span>Current Turn: Player {{currentGame.currentPlayerIdTurn}}</span>
+  </div>
+  <div class="row">
+    <div class="col-xs">
+      <h1>Your Grid</h1>
+      <app-game-grid [shipCoordinates]="shipCoordinates" [setCellInGrid]="setCellTypeInThisPlayerGrid"></app-game-grid>
+    </div>
+    <div class="col-xs">
+      <h1>Enemy Grid</h1>
+      <app-game-grid (cellSelectedEvent)="onCellSelectedEvent($event)" [setCellInGrid]="setCellTypeInOtherPlayerGrid" [shipCoordinates]="selectedCoordinates" [isPlayerGrid]="false"></app-game-grid>
+    </div>
+  </div>
+
+</div>
+

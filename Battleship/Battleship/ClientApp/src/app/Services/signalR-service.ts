@@ -3,6 +3,9 @@ import * as signalR from '@aspnet/signalr';
 import { GameModel } from '../models/game-model';
 import { UpdatedPlayer } from '../models/updated-player';
 import { UpdatedGame } from '../models/updated-game-model';
+import { Result } from '../models/result-data';
+import { CoordinatesModel } from '../models/coordinates-model';
+import { AttackingPlayerRequest } from '../models/attacking-player-result';
 
 @Injectable({
   providedIn: 'root'
@@ -55,10 +58,18 @@ private baseUrl: string;
   }
 
   public addUpdatedGameStatusListener = (callBack: (updatedGame: UpdatedGame) => void) => {
-    this.hubConnection.on('setgamestatus', (data) => {
+    this.hubConnection.on('sendupdategamestatus', (data) => {
       if (callBack) {
         callBack(data);
       }
-    })
+    });
+  }
+
+  public addSendAttackPlayerCoordinatesListener = (callBack: (result: AttackingPlayerRequest) => void) => {
+    this.hubConnection.on('sendattackplayercoordinates', (data) => {
+      if (callBack) {
+        callBack(data);
+      }
+  });
   }
 }

@@ -1,4 +1,6 @@
 import { Component, OnInit, EventEmitter, Output, Input, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CellModel } from '../models/cell-model';
 import { CoordinatesModel } from '../models/coordinates-model';
 import { CellType } from '../models/enums/cell-type';
@@ -6,6 +8,7 @@ import { RowModel } from '../models/row-model';
 import { ShipModel } from '../models/ship-model';
 import { UpdatedShipEventModel } from '../models/updated-ship-event-model';
 import { CoordinatesHelperService } from '../Services/coordinates-helper-service';
+import { SetNewCoordinatesEvent } from '../models/set-new-coordinates-event';
 
 @Component({
   selector: 'app-game-grid',
@@ -18,20 +21,39 @@ export class GameGridComponent implements OnInit, OnDestroy {
 
   public rows: Array<RowModel>;
   @Input() shipCoordinates: Array<CoordinatesModel>;
+  @Input() setCellInGrid: EventEmitter<SetNewCoordinatesEvent>;
+  @Input() isPlayerGrid: boolean = true;
 
   @Output() public cellSelectedEvent: EventEmitter<CoordinatesModel> = new EventEmitter<CoordinatesModel>();
+
+  private unsubscribe: Subject<null> = new Subject();
   ngOnInit(): void {
     this.rows = this.buildGrid(this.shipCoordinates);
-    this.coordinateHelperService.updatedShipEvent.subscribe((eventModel: UpdatedShipEventModel) => {
+    this.coordinateHelperService.updatedShipEvent
+    .pipe(
+      takeUntil(this.unsubscribe)
+    )
+    .subscribe((eventModel: UpdatedShipEventModel) => {
       // remove old Ship
       this.coordinateHelperService.setCellTypeByShip(this.rows, eventModel.previousShipModel, CellType.Empty);
       // update new ship
       this.coordinateHelperService.setCellTypeByShip(this.rows, eventModel.newShipModel, CellType.HasShip);
     });
+
+    if (this.setCellInGrid) {
+      this.setCellInGrid
+    .pipe(
+      takeUntil(this.unsubscribe)
+    )
+    .subscribe((eventModel: SetNewCoordinatesEvent) => {
+      this.coordinateHelperService.setCellTypeInRows(this.rows, [eventModel.coordinates], eventModel.cellType);
+    });
+    }
   }
 
   ngOnDestroy(): void {
-
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 
   public onCellSelect(cell: CellModel): void {
@@ -75,9 +97,13 @@ export class GameGridComponent implements OnInit, OnDestroy {
   private buildCells(rowNumber: number, cells: Array<CellModel>, coordinatesForRow: Array<CoordinatesModel>): void {
     for (let index = 0; index < 10; index++) {
       const columnNumber: number = index + 1;
-      const cellType: CellType = coordinatesForRow && coordinatesForRow.find(x => x.xPosition === columnNumber) ?
-      CellType.HasShip :
-      CellType.Empty;
+      let cellType: CellType = CellType.Empty;
+      if (coordinatesForRow) {
+        const foundCoordinates: CoordinatesModel = coordinatesForRow.find(x => x.xPosition === columnNumber);
+        if (foundCoordinates) {
+          cellType = this.coordinateHelperService.getCellType(foundCoordinates.hit);
+        }
+      }
       const cell = new CellModel(null, new CoordinatesModel(columnNumber, rowNumber), cellType);
       cells.push(cell);
     }

@@ -6,15 +6,22 @@ using Battleship.Data.Enums;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Battleship.Logic.Enums;
+using Battleship.Logic.InternalModels.Interfaces;
+using Battleship.Logic.InternalModels;
 
 namespace Battleship.Logic.Factories
 {
     public class GameFactory : IGameFactory
     {
         private readonly IShipFactory _shipFactory;
-        public GameFactory(IShipFactory shipFactory)
+        private readonly IRandomGeneratorFactory _randomGeneratorFactory;
+        private readonly IPlayerFactory _playerFactory;
+        public GameFactory(IShipFactory shipFactory, IRandomGeneratorFactory randomGeneratorFactory,
+                           IPlayerFactory playerFactory)
         {
             _shipFactory = shipFactory;
+            _randomGeneratorFactory = randomGeneratorFactory;
+            _playerFactory = playerFactory;
         }
         public List GetGameListViewModel(Game game)
         {
@@ -27,12 +34,15 @@ namespace Battleship.Logic.Factories
 
         public GameViewModel GetGameViewModel(Game game, int playerId)
         {
+            IPlayer player = _playerFactory.GetPlayer(playerId);
             var gameViewModel =  new GameViewModel
             {
                 GameId = game.GameId,
                 Description = game.Description,
+                CurrentPlayerIdTurn = game.CurrentPlayerIdTurn,
                 PlayerId = playerId,
-                Ships = playerId == 1 ? JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player1ShipsJSON) : JsonConvert.DeserializeObject<List<ShipViewModel>>(game.Player2ShipsJSON),
+                Ships = player.GetShipViewModelsFromString(game),
+                AttemptedCoordinates = player.GetAttemptedCoordinatesFromString(game),
                 Player1Status = game.Player1Status,
                 Player2Status = game.Player2Status
             };
@@ -48,9 +58,24 @@ namespace Battleship.Logic.Factories
                 GameStatus = GameStatus.Active,
                 Player1ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips()),
                 Player2ShipsJSON = JsonConvert.SerializeObject(_shipFactory.GetDefaultShips()),
+                Player1AttemptedCoordinatesJSON = JsonConvert.SerializeObject(new List<CoordinatesViewModel>()),
+                Player2AttemptedCoordinatesJSON = JsonConvert.SerializeObject(new List<CoordinatesViewModel>()),
                 Player1Status = PlayerStatus.Preparing,
                 Player2Status = PlayerStatus.Empty
             };
+        }
+
+        public IGameType GetGameType(Game game, GameStatus gameStatus)
+        {
+            switch (gameStatus)
+            {
+                case GameStatus.Planning:
+                    return new PlanningGame(game);
+                case GameStatus.Started:
+                    return new StartedGame(game, _randomGeneratorFactory);
+                default:
+                    return new StartedGame(game, _randomGeneratorFactory);
+            }
         }
     }
 }
