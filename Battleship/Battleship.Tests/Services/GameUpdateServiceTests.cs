@@ -160,7 +160,8 @@ namespace Battleship.Tests.Services
                     {
                         Coordinates = new List<CoordinatesViewModel>
                         {
-                            new CoordinatesViewModel(1, 1)
+                            new CoordinatesViewModel(1, 1),
+                            new CoordinatesViewModel(1, 2)
                         }
                     }
                 }
@@ -177,6 +178,42 @@ namespace Battleship.Tests.Services
             Assert.IsNotNull(game.Player1AttemptedCoordinatesJSON);
             Assert.IsNotNull(game.Player2ShipsJSON);
             Assert.AreNotEqual(1, game.CurrentPlayerIdTurn);
+            Assert.IsNull(result.WinnerOfGamePlayerId);
+        }
+
+        [TestMethod]
+        public async Task ResolvePlayerAttack_Should_Show_Correct_Result_When_Hitting_Defending_Player_And_Defeating_Them()
+        {
+            var game = new Game { CurrentPlayerIdTurn = 1 };
+            _gameDbService.Setup(s => s.GetById(It.IsAny<int>())).Returns(new Result<Game> { Data = game, Success = true });
+            var gameViewModel = new GameViewModel
+            {
+                AttemptedCoordinates = new List<CoordinatesViewModel>(),
+                Ships = new List<ShipViewModel>
+                {
+                    new ShipViewModel
+                    {
+                        Coordinates = new List<CoordinatesViewModel>
+                        {
+                            new CoordinatesViewModel(1, 1)
+                        }
+                    }
+                }
+            };
+            _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), It.IsAny<int>())).Returns(gameViewModel);
+            _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
+
+            var result = await _gameUpdateService.ResolvePlayerAttack(1, 1, 2, new CoordinatesViewModel(1, 1));
+
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(gameViewModel.AttemptedCoordinates.Count > 0);
+            Assert.IsTrue(gameViewModel.Ships.FirstOrDefault().Coordinates.FirstOrDefault().Hit.Value);
+            Assert.AreEqual($"Player 1 Hits Player 2", result.Message);
+            Assert.IsNotNull(game.Player1AttemptedCoordinatesJSON);
+            Assert.IsNotNull(game.Player2ShipsJSON);
+            Assert.AreNotEqual(1, game.CurrentPlayerIdTurn);
+            Assert.AreEqual(1, result.WinnerOfGamePlayerId);
+            Assert.AreEqual(GameStatus.Completed, game.GameStatus);
         }
 
         [TestMethod]

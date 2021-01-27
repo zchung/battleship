@@ -12,6 +12,6 @@ namespace Battleship.Logic.Services.Interfaces
         Task<Result<Game>> UpdateGameAfterPlayerJoins(int gameId);
         Task<Result<Game>> UpdatePlayerToReady(int gameId, int playerId);
         Task<Result<Game>> UpdateGameStatus(int gameId, GameStatus status);
-        Task<Result<CoordinatesViewModel>> ResolvePlayerAttack(int gameId, int playerIdAttacking, int playerToAttackId, CoordinatesViewModel coordinatesViewModel);
+        Task<AttackingPlayerResult> ResolvePlayerAttack(int gameId, int playerIdAttacking, int playerToAttackId, CoordinatesViewModel coordinatesViewModel);
     }
 }

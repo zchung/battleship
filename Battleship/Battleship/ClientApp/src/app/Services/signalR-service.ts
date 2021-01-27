@@ -5,7 +5,7 @@ import { UpdatedPlayer } from '../models/updated-player';
 import { UpdatedGame } from '../models/updated-game-model';
 import { Result } from '../models/result-data';
 import { CoordinatesModel } from '../models/coordinates-model';
-import { AttackingPlayerRequest } from '../models/attacking-player-result';
+import { AttackingPlayerResult } from '../models/attacking-player-result';
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +65,7 @@ private baseUrl: string;
     });
   }
 
-  public addSendAttackPlayerCoordinatesListener = (callBack: (result: AttackingPlayerRequest) => void) => {
+  public addSendAttackPlayerCoordinatesListener = (callBack: (result: AttackingPlayerResult) => void) => {
     this.hubConnection.on('sendattackplayercoordinates', (data) => {
       if (callBack) {
         callBack(data);

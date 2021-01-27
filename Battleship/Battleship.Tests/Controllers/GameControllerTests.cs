@@ -72,6 +72,7 @@ namespace Battleship.Tests.Controllers
         [TestMethod]
         public async Task Join_Should_Correctly_Return_The_Updated_Result()
         {
+            _gameValidationService.Setup(s => s.CanJoinGame(It.IsAny<int>())).Returns(new Result { Success = true });
             _gameUpdateService.Setup(s => s.UpdateGameAfterPlayerJoins(1)).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true });
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 2)).Returns(new GameViewModel());
             _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
@@ -83,6 +84,20 @@ namespace Battleship.Tests.Controllers
 
             var castResult = ValidateOkResult<Result<GameViewModel>>(result);
             Assert.IsTrue(castResult.Success);
+        }
+
+        [TestMethod]
+        public async Task Join_Should_Correctly_Return_The_Result_If_It_Fails_Validation()
+        {
+            _gameValidationService.Setup(s => s.CanJoinGame(It.IsAny<int>())).Returns(new Result { Success = false, Message = "Cannot join" });
+
+            var result = await _gameController.Join(new JoinGameRequest { GameId = 1 });
+
+            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<List>()), Times.Never);
+            _gameHubContext.Verify(v => v.Clients.All.SendPlayerHasJoined(It.IsAny<UpdatedPlayer>()), Times.Never);
+
+            var castResult = ValidateOkResult<Result>(result);
+            Assert.IsFalse(castResult.Success);
         }
 
         [TestMethod]
@@ -139,7 +154,7 @@ namespace Battleship.Tests.Controllers
         {
             _gameValidationService.Setup(s => s.CanAttackPlayer(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result { Success = true });
             _gameUpdateService.Setup(s => s.ResolvePlayerAttack(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CoordinatesViewModel>()))
-                .ReturnsAsync(new Result<CoordinatesViewModel> { Success = true, Data = new CoordinatesViewModel(1, 1)});
+                .ReturnsAsync(new AttackingPlayerResult(1, 1, 2, new CoordinatesViewModel(1, 1), true, null));
 
             var result = await _gameController.AttackPlayer(new AttackPlayerRequest());
 
