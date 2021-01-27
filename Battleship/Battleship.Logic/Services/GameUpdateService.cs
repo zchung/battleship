@@ -107,9 +107,9 @@ namespace Battleship.Logic.Services
 
             return gameResult;
         }
-        public async Task<Result<CoordinatesViewModel>> ResolvePlayerAttack(int gameId, int playerIdAttacking, int playerToAttackId, CoordinatesViewModel coordinatesViewModel)
+        public async Task<AttackingPlayerResult> ResolvePlayerAttack(int gameId, int playerIdAttacking, int playerToAttackId, CoordinatesViewModel coordinatesViewModel)
         {
-            Result<CoordinatesViewModel> coordinatesResult = new Result<CoordinatesViewModel> { Data = coordinatesViewModel };
+            var attackingPlayerResult = new AttackingPlayerResult(gameId, playerIdAttacking, playerToAttackId, coordinatesViewModel, false, "");
             var attackingPlayer = _playerFactory.GetPlayer(playerIdAttacking);
             var defendingPlayer = _playerFactory.GetPlayer(playerToAttackId);
             var gameResult = _gameDbService.GetById(gameId);
@@ -122,32 +122,39 @@ namespace Battleship.Logic.Services
                 }
                 else
                 {
-                    coordinatesResult.Message = "This coordinate has already been selected";
-                    return coordinatesResult;
+
+                    attackingPlayerResult.Message = "This coordinate has already been selected";
+                    return attackingPlayerResult;
                 }
                 string finalMessage = $"Player {playerIdAttacking} {{0}} Player {playerToAttackId}";
                 var defendingPlayerGameViewModel = _gameFactory.GetGameViewModel(gameResult.Data, playerToAttackId);
                 if (defendingPlayerGameViewModel.AttackPlayer(coordinatesViewModel))
                 {
-                    coordinatesResult.Message = string.Format(finalMessage, "Hits");
+                    attackingPlayerResult.Message = string.Format(finalMessage, "Hits");
                 }
                 else
                 {
-                    coordinatesResult.Message = string.Format(finalMessage, "Misses");
+                    attackingPlayerResult.Message = string.Format(finalMessage, "Misses");
                 }
 
                 gameResult.Data.CurrentPlayerIdTurn = defendingPlayer.PlayerId;
 
                 attackingPlayer.SetAttemptedCoordinatesJSON(attackingPlayerGameViewModel, gameResult.Data);
                 defendingPlayer.SetShipViewModelJSON(defendingPlayerGameViewModel, gameResult.Data);
+                if (defendingPlayerGameViewModel.AllShipsDestroyed())
+                {
+                    attackingPlayerResult.WinnerOfGamePlayerId = attackingPlayer.PlayerId;
+                    gameResult.Data.GameStatus = GameStatus.Completed;
+                }
                 var saveResult = await _gameDbService.SaveChangesAsync();
+                
                 if (saveResult.Success)
                 {
-                    coordinatesResult.Success = true;
+                    attackingPlayerResult.Success = true;
                 }
             }
 
-            return coordinatesResult;
+            return attackingPlayerResult;
 
         }
     }

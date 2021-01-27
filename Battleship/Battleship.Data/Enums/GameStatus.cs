@@ -5,6 +5,7 @@ namespace Battleship.Data.Enums
     {
         Planning = 0,
         Active = 1,
-        Started = 2
+        Started = 2,
+        Completed = 3
     }
 }

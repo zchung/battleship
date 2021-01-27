@@ -71,6 +71,11 @@ namespace Battleship.Controllers
         [Route("join")]
         public async Task<IActionResult> Join(JoinGameRequest joinGameRequest)
         {
+            var joinValidationResult = _gameValidationService.CanJoinGame(joinGameRequest.GameId);
+            if (!joinValidationResult.Success)
+            {
+                return Ok(joinValidationResult);
+            }
             var updateGameResult =  await _gameUpdateService.UpdateGameAfterPlayerJoins(joinGameRequest.GameId);
             Result<GameViewModel> result = new Result<GameViewModel>();
             if (updateGameResult.Success)
@@ -148,14 +153,12 @@ namespace Battleship.Controllers
             if (result.Success)
             {
                 await _gameHubContext.Clients.All.SendAttackPlayerCoordinates(
-                    new AttackingPlayerResult(request.GameId, request.PlayerIdAttacking, 
-                                              request.PlayerIdToAttack, result.Data, result.Success,
-                                              result.Message)
+                    result
                     );
             }
 
 
-            return Ok(result);
+            return Ok(new Result<CoordinatesViewModel> { Success = result.Success, Data = result.Data });
         }
     }
 }

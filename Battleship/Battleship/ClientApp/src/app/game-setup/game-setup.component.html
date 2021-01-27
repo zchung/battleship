@@ -42,6 +42,8 @@
     <div class="row" *ngIf="gameIsStarting">
       <span class="alert alert-info">Game staring in....{{secondsTillStart}}</span></div>
   </fieldset>
-  <app-game-grid (cellSelectedEvent)="onCellSelectedEvent($event)" [shipCoordinates]="shipCoordinates"></app-game-grid>
+  <div class="row">
+    <app-game-grid (cellSelectedEvent)="onCellSelectedEvent($event)" [shipCoordinates]="shipCoordinates"></app-game-grid>
+  </div>
 </div>
 

@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit } from '@angular/core';
 import { GameApiService } from '../Services/game-api-services';
 import { GameStoreService } from '../Services/game-store-service';
 import { GameModel } from '../models/game-model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { CoordinatesModel } from '../models/coordinates-model';
 import { AttackPlayerRequest } from '../models/requests/attack-player-request';
@@ -41,7 +41,8 @@ export class GamePlayAreaComponent implements OnInit {
 
   constructor(private gameApiService: GameApiService, private gameStoreService: GameStoreService,
               private route: ActivatedRoute, private playerFactory: PlayerFactory,
-              private signalRService: SignalRService, private coordinatesHelperService: CoordinatesHelperService) {
+              private signalRService: SignalRService, private coordinatesHelperService: CoordinatesHelperService,
+              private router: Router) {
 
   }
 
@@ -71,7 +72,11 @@ export class GamePlayAreaComponent implements OnInit {
             this.currentGame.currentPlayerIdTurn = data.playerIdToAttack;
             this.setCellTypeInThisPlayerGrid.emit(
               new SetNewCoordinatesEvent(data.data, this.coordinatesHelperService.getCellType(data.data.hit))
-            )
+            );
+          }
+          if (data.winnerOfGamePlayerId) {
+            alert(`Game over winner is Player: ${data.winnerOfGamePlayerId}`);
+            this.router.navigate(['/']);
           }
         }
       }

@@ -1,5 +1,6 @@
 ﻿
 
+using Battleship.Data.Enums;
 using Battleship.Data.Models;
 using Battleship.Logic.Services.Interfaces;
 
@@ -18,6 +19,11 @@ namespace Battleship.Logic.Services
             var gameResult = _gameDbService.GetById(gameId);
             if (gameResult.Success)
             {
+                if (gameResult.Data.GameStatus == GameStatus.Completed)
+                {
+                    result.Message = "This game is completed. You cannot play";
+                    return result;
+                }
                 if (gameResult.Data.CurrentPlayerIdTurn == playerIdAttacking)
                 {
                     result.Success = true;
@@ -32,6 +38,26 @@ namespace Battleship.Logic.Services
                 result.Message = gameResult.Message;
             }
 
+            return result;
+        }
+
+        public Result CanJoinGame(int gameId)
+        {
+            Result result = new Result();
+            var gameResult = _gameDbService.GetById(gameId);
+            if (gameResult.Success)
+            {
+                result.Success = true;
+                if (gameResult.Data.GameStatus != GameStatus.Active)
+                {
+                    result.Success = false;
+                    result.Message = "Cannot join game, it has already started";
+                }
+            }
+            else
+            {
+                result.Message = gameResult.Message;
+            }
             return result;
         }
     }
