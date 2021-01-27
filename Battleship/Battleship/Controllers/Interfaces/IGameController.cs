@@ -14,5 +14,6 @@ namespace Battleship.Controllers.Interfaces
         IActionResult Get(int gameId, int playerId);
         Task<IActionResult> SetPlayerToReady(GamePlayerRequest gamePlayerRequest);
         Task<IActionResult> SetGameStatus(SetGameStatusRequest request);
+        Task<IActionResult> AttackPlayer(AttackPlayerRequest request);
     }
 }

@@ -10,6 +10,8 @@ import { JoinGameRequest } from '../models/requests/join-game-request';
 import { GamePlayerRequest } from '../models/requests/game-player-request';
 import { SetGameStatusRequest } from '../models/requests/set-game-status-request';
 import { UpdatedGame } from '../models/updated-game-model';
+import { AttackPlayerRequest } from '../models/requests/attack-player-request';
+import { CoordinatesModel } from '../models/coordinates-model';
 @Injectable({
   providedIn: 'root'
 })
@@ -41,5 +43,9 @@ export class GameApiService {
 
   setGameStatus(setGameStatusRequest: SetGameStatusRequest): Observable<result.Result> {
     return this.http.post<result.Result>(`${this.baseUrl}setgamestatus`, setGameStatusRequest);
+  }
+
+  attackPlayer(attackPlayerRequest: AttackPlayerRequest): Observable<Result<CoordinatesModel>> {
+    return this.http.post<Result<CoordinatesModel>>(`${this.baseUrl}attackplayer`, attackPlayerRequest);
   }
 }

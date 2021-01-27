@@ -36,6 +36,9 @@ namespace Battleship
             services.AddScoped<ICoordinatesValidationService, CoordinatesValidationService>();
             services.AddScoped<ICoordinatesUpdateService, CoordinatesUpdateService>();
             services.AddScoped<IShipUpdateService, ShipUpdateService>();
+            services.AddScoped<IRandomGeneratorFactory, RandomGeneratorFactory>();
+            services.AddScoped<IPlayerFactory, PlayerFactory>();
+            services.AddScoped<IGameValidationService, GameValidationService>();
 
             services.AddDbContext<IBattleshipDbContext, BattleshipDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 

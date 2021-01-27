@@ -2,6 +2,7 @@
 using Battleship.Data.Entities;
 using Battleship.Data.Enums;
 using Battleship.Data.Models;
+using Battleship.Logic.ViewModels;
 using System.Threading.Tasks;
 
 namespace Battleship.Logic.Services.Interfaces
@@ -10,6 +11,7 @@ namespace Battleship.Logic.Services.Interfaces
     {
         Task<Result<Game>> UpdateGameAfterPlayerJoins(int gameId);
         Task<Result<Game>> UpdatePlayerToReady(int gameId, int playerId);
-        Task<Result> UpdateGameStatus(int gameId, GameStatus status);
+        Task<Result<Game>> UpdateGameStatus(int gameId, GameStatus status);
+        Task<Result<CoordinatesViewModel>> ResolvePlayerAttack(int gameId, int playerIdAttacking, int playerToAttackId, CoordinatesViewModel coordinatesViewModel);
     }
 }

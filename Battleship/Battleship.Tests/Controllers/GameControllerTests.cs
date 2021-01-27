@@ -26,6 +26,7 @@ namespace Battleship.Tests.Controllers
         private Mock<IGameFactory> _gameFactory;
         private Mock<IGameUpdateService> _gameUpdateService;
         private Mock<IHubContext<GameHub, IGameHub>> _gameHubContext;
+        private Mock<IGameValidationService> _gameValidationService;
         private IGameController _gameController;
 
         [TestInitialize]
@@ -37,7 +38,8 @@ namespace Battleship.Tests.Controllers
             _gameHubContext = new Mock<IHubContext<GameHub, IGameHub>>();
             var gameHub = new Mock<IGameHub>();
             _gameHubContext.Setup(s => s.Clients.All).Returns(gameHub.Object);
-            _gameController = new GameController(_gameDbService.Object, _gameFactory.Object, _gameUpdateService.Object, _gameHubContext.Object);
+            _gameValidationService = new Mock<IGameValidationService>();
+            _gameController = new GameController(_gameDbService.Object, _gameFactory.Object, _gameUpdateService.Object, _gameHubContext.Object, _gameValidationService.Object);
         }
 
         [TestMethod]
@@ -48,7 +50,7 @@ namespace Battleship.Tests.Controllers
             _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
             _gameFactory.Setup(s => s.CreateNewGame(It.IsAny<string>())).Returns(new Game());
 
-            var result = await _gameController.Create(new CreateGameRequest());
+            var result = await _gameController.Create(new CreateGameRequest { Description = "Test Game"});
 
             _gameHubContext.Verify(v => v.Clients.All.SendNewGame(It.IsAny<List>()), Times.Once);
 
@@ -124,12 +126,36 @@ namespace Battleship.Tests.Controllers
         [TestMethod]
         public async Task SetGameStatus_Should_Return_The_Result()
         {
-            _gameUpdateService.Setup(s => s.UpdateGameStatus(It.IsAny<int>(), It.IsAny<GameStatus>())).ReturnsAsync(new Result { Success = true });
+            _gameUpdateService.Setup(s => s.UpdateGameStatus(It.IsAny<int>(), It.IsAny<GameStatus>())).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true });
 
             var result = await _gameController.SetGameStatus(new SetGameStatusRequest { GameId = 1, GameStatus = GameStatus.Started });
 
             var castResult = ValidateOkResult<Result>(result);
             Assert.IsTrue(castResult.Success);
+        }
+
+        [TestMethod]
+        public async Task AttackPlayer_Should_Correctly_Invoke_The_Right_Methods()
+        {
+            _gameValidationService.Setup(s => s.CanAttackPlayer(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result { Success = true });
+            _gameUpdateService.Setup(s => s.ResolvePlayerAttack(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CoordinatesViewModel>()))
+                .ReturnsAsync(new Result<CoordinatesViewModel> { Success = true, Data = new CoordinatesViewModel(1, 1)});
+
+            var result = await _gameController.AttackPlayer(new AttackPlayerRequest());
+
+            var castResult = ValidateOkResult<Result<CoordinatesViewModel>>(result);
+            Assert.IsTrue(castResult.Success);
+        }
+
+        [TestMethod]
+        public async Task AttackPlayer_Should_Return_False_Result_If_Unable_To_Attack()
+        {
+            _gameValidationService.Setup(s => s.CanAttackPlayer(It.IsAny<int>(), It.IsAny<int>())).Returns(new Result { Success = false, Message = "unable to attack" });
+
+            var result = await _gameController.AttackPlayer(new AttackPlayerRequest());
+
+            var castResult = ValidateOkResult<Result>(result);
+            Assert.IsFalse(castResult.Success);
         }
     }
 }
