@@ -73,7 +73,7 @@ namespace Battleship.Tests.Services
         }
 
         [TestMethod]
-        public async Task UpdatePlayerToReady_Should_Update_The_Status_If_The_Condition_Is_Met()
+        public async Task UpdatePlayer1ToReady_Should_Update_The_Status_If_The_Condition_Is_Met()
         {
             _gameDbService.Setup(s => s.GetById(1)).Returns(new Result<Game> { Data = new Game(), Success = true });
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel 
@@ -94,6 +94,35 @@ namespace Battleship.Tests.Services
             _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
 
             var result = await _gameUpdateService.UpdatePlayerToReady(1, 1);
+
+            _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
+
+            Assert.IsTrue(result.Success);
+            Assert.IsNotNull(result.Data);
+        }
+
+        [TestMethod]
+        public async Task UpdatePlayer2ToReady_Should_Update_The_Status_If_The_Condition_Is_Met()
+        {
+            _gameDbService.Setup(s => s.GetById(1)).Returns(new Result<Game> { Data = new Game(), Success = true });
+            _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 2)).Returns(new GameViewModel
+            {
+                Ships = new List<ShipViewModel>
+                {
+                    new ShipViewModel
+                    {
+                        Size = 2,
+                        Coordinates = new List<CoordinatesViewModel>
+                        {
+                            new CoordinatesViewModel(1, 1),
+                            new CoordinatesViewModel(1, 2)
+                        }
+                    }
+                }
+            });
+            _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
+
+            var result = await _gameUpdateService.UpdatePlayerToReady(1, 2);
 
             _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
 
@@ -130,6 +159,34 @@ namespace Battleship.Tests.Services
         }
 
         [TestMethod]
+        public async Task UpdatePlayerToPrepared_Should_Return_Error_If_Save_Failed()
+        {
+            _gameDbService.Setup(s => s.GetById(1)).Returns(new Result<Game> { Data = new Game(), Success = true });
+            _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel
+            {
+                Ships = new List<ShipViewModel>
+                {
+                    new ShipViewModel
+                    {
+                        Size = 2,
+                        Coordinates = new List<CoordinatesViewModel>
+                        {
+
+                        }
+                    }
+                }
+            });
+            _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = false, Message = "Error" });
+
+            var result = await _gameUpdateService.UpdatePlayerToReady(1, 1);
+
+            _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Never);
+
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.Message);
+        }
+
+        [TestMethod]
         public async Task UpdateGameStatus_Should_Correctly_Update_The_Status()
         {
             Game game = new Game();
@@ -144,6 +201,23 @@ namespace Battleship.Tests.Services
 
             Assert.IsTrue(result.Success);
             Assert.AreEqual(gameStatus, game.GameStatus);
+        }
+
+        [TestMethod]
+        public async Task UpdateGameStatus_Should_Return_False_If_Save_Fails()
+        {
+            Game game = new Game();
+            GameStatus gameStatus = GameStatus.Started;
+            _gameDbService.Setup(s => s.GetById(It.IsAny<int>())).Returns(new Result<Game> { Data = game, Success = true });
+            _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = false, Message = "Error" });
+            _gameFactory.Setup(s => s.GetGameType(It.IsAny<Game>(), It.IsAny<GameStatus>())).Returns(new Mock<IGameType>().Object);
+
+            var result = await _gameUpdateService.UpdateGameStatus(1, gameStatus);
+
+            _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
+
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.Message);
         }
 
         [TestMethod]

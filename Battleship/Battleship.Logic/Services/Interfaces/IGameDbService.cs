@@ -11,7 +11,7 @@ namespace Battleship.Logic.Services.Interfaces
     {
         Task<Result<Game>> Create(Game game);
 
-        Task<Result<IEnumerable<List>>> GetActiveGames();
+        Task<Result<IEnumerable<GameListViewModel>>> GetActiveGames();
         Result<Game> GetById(int id);
         Task<Result> SaveChangesAsync();
     }

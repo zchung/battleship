@@ -23,9 +23,9 @@ namespace Battleship.Logic.Factories
             _randomGeneratorFactory = randomGeneratorFactory;
             _playerFactory = playerFactory;
         }
-        public List GetGameListViewModel(Game game)
+        public GameListViewModel GetGameListViewModel(Game game)
         {
-            return new List
+            return new GameListViewModel
             {
                 GameId = game.GameId,
                 Description = game.Description

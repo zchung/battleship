@@ -83,5 +83,27 @@ namespace Battleship.Tests.Services
 
             Assert.IsTrue(result.Success);
         }
+
+        [TestMethod]
+        public void ValidateCoordinatesForOverlapping_Should_Return_False_If_Coordinates_Overlap()
+        {
+            List<CoordinatesViewModel> newCoordinates = new List<CoordinatesViewModel>
+            {
+                new CoordinatesViewModel(1, 1),
+                new CoordinatesViewModel(1, 2),
+                new CoordinatesViewModel(1, 3)
+            };
+
+            List<CoordinatesViewModel> existingCoordinates = new List<CoordinatesViewModel>
+            {
+                new CoordinatesViewModel(1, 1),
+                new CoordinatesViewModel(2, 2),
+                new CoordinatesViewModel(2, 3)
+            };
+
+            Result result = _coordinatesValidationService.ValidateCoordinatesForOverlapping(newCoordinates, existingCoordinates);
+
+            Assert.IsFalse(result.Success);
+        }
     }
 }

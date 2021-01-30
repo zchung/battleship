@@ -31,7 +31,7 @@ namespace Battleship
             services.AddScoped<IGameDbService, GameDbService>();
             services.AddScoped<IGameFactory, GameFactory>();
             services.AddScoped<IGameUpdateService, GameUpdateService>();
-            services.AddScoped<IShipFactory, ShipFactory>();
+            services.AddScoped<IShipFactory, ShipFactory>(); 
             services.AddScoped<ICoordinatesFactory, CoordinatesFactory>();
             services.AddScoped<ICoordinatesValidationService, CoordinatesValidationService>();
             services.AddScoped<ICoordinatesUpdateService, CoordinatesUpdateService>();

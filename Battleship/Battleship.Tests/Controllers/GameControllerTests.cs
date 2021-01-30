@@ -47,25 +47,40 @@ namespace Battleship.Tests.Controllers
         {
             _gameDbService.Setup(s => s.Create(It.IsAny<Game>())).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true });
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel());
-            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
+            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new GameListViewModel());
             _gameFactory.Setup(s => s.CreateNewGame(It.IsAny<string>())).Returns(new Game());
 
             var result = await _gameController.Create(new CreateGameRequest { Description = "Test Game"});
 
-            _gameHubContext.Verify(v => v.Clients.All.SendNewGame(It.IsAny<List>()), Times.Once);
+            _gameHubContext.Verify(v => v.Clients.All.SendNewGame(It.IsAny<GameListViewModel>()), Times.Once);
 
             var castResult = ValidateOkResult<Result<GameViewModel>>(result);
             Assert.IsTrue(castResult.Success);
         }
 
         [TestMethod]
+        public async Task Create_Should_Return_Failure_If_The_Result_Is_False()
+        {
+            _gameDbService.Setup(s => s.Create(It.IsAny<Game>())).ReturnsAsync(new Result<Game> { Success = false, Message = "Error" });
+            _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 1)).Returns(new GameViewModel());
+            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new GameListViewModel());
+            _gameFactory.Setup(s => s.CreateNewGame(It.IsAny<string>())).Returns(new Game());
+
+            var result = await _gameController.Create(new CreateGameRequest { Description = "Test Game" });
+
+            var castResult = ValidateOkResult<Result<GameViewModel>>(result);
+            Assert.IsFalse(castResult.Success);
+            Assert.IsNotNull(castResult.Message);
+        }
+
+        [TestMethod]
         public async Task GetActive_Should_Return_The_Result()
         {
-            _gameDbService.Setup(s => s.GetActiveGames()).ReturnsAsync(new Result<IEnumerable<List>> { Success = true });
+            _gameDbService.Setup(s => s.GetActiveGames()).ReturnsAsync(new Result<IEnumerable<GameListViewModel>> { Success = true });
 
             var result = await _gameController.GetActive();
 
-            var castresult = ValidateOkResult<Result<IEnumerable<List>>>(result);
+            var castresult = ValidateOkResult<Result<IEnumerable<GameListViewModel>>>(result);
             Assert.IsTrue(castresult.Success);
         }
 
@@ -75,11 +90,11 @@ namespace Battleship.Tests.Controllers
             _gameValidationService.Setup(s => s.CanJoinGame(It.IsAny<int>())).Returns(new Result { Success = true });
             _gameUpdateService.Setup(s => s.UpdateGameAfterPlayerJoins(1)).ReturnsAsync(new Result<Game> { Data = new Game(), Success = true });
             _gameFactory.Setup(s => s.GetGameViewModel(It.IsAny<Game>(), 2)).Returns(new GameViewModel());
-            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new List());
+            _gameFactory.Setup(s => s.GetGameListViewModel(It.IsAny<Game>())).Returns(new GameListViewModel());
 
             var result = await _gameController.Join(new JoinGameRequest { GameId = 1 });
 
-            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<List>()), Times.Once);
+            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<GameListViewModel>()), Times.Once);
             _gameHubContext.Verify(v => v.Clients.All.SendPlayerHasJoined(It.IsAny<UpdatedPlayer>()), Times.Once);
 
             var castResult = ValidateOkResult<Result<GameViewModel>>(result);
@@ -93,11 +108,27 @@ namespace Battleship.Tests.Controllers
 
             var result = await _gameController.Join(new JoinGameRequest { GameId = 1 });
 
-            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<List>()), Times.Never);
+            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<GameListViewModel>()), Times.Never);
             _gameHubContext.Verify(v => v.Clients.All.SendPlayerHasJoined(It.IsAny<UpdatedPlayer>()), Times.Never);
 
             var castResult = ValidateOkResult<Result>(result);
             Assert.IsFalse(castResult.Success);
+        }
+
+        [TestMethod]
+        public async Task Join_Should_Correctly_Return_The_Result_If_Update_Game_Fails()
+        {
+            _gameValidationService.Setup(s => s.CanJoinGame(It.IsAny<int>())).Returns(new Result { Success = true });
+            _gameUpdateService.Setup(s => s.UpdateGameAfterPlayerJoins(1)).ReturnsAsync(new Result<Game> { Success = false, Message = "Update game fails" });
+
+            var result = await _gameController.Join(new JoinGameRequest { GameId = 1 });
+
+            _gameHubContext.Verify(v => v.Clients.All.RemoveGame(It.IsAny<GameListViewModel>()), Times.Never);
+            _gameHubContext.Verify(v => v.Clients.All.SendPlayerHasJoined(It.IsAny<UpdatedPlayer>()), Times.Never);
+
+            var castResult = ValidateOkResult<Result>(result);
+            Assert.IsFalse(castResult.Success);
+            Assert.IsNotNull(castResult.Message);
         }
 
         [TestMethod]
@@ -156,7 +187,7 @@ namespace Battleship.Tests.Controllers
             _gameUpdateService.Setup(s => s.ResolvePlayerAttack(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CoordinatesViewModel>()))
                 .ReturnsAsync(new AttackingPlayerResult(1, 1, 2, new CoordinatesViewModel(1, 1), true, null));
 
-            var result = await _gameController.AttackPlayer(new AttackPlayerRequest());
+            var result = await _gameController.AttackPlayer(new AttackPlayerRequest { GameId = 1, PlayerIdAttacking = 1, PlayerIdToAttack = 2, CoordinatesViewModel = new CoordinatesViewModel() });
 
             var castResult = ValidateOkResult<Result<CoordinatesViewModel>>(result);
             Assert.IsTrue(castResult.Success);
