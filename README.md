@@ -10,7 +10,8 @@ Step 4 each round players will make random coordinate choices against each other
 Step 5 determine if the defending player has lost after each turn.
 Step 6 report the results
 
-To run this project set the Battleship.Console Project as the Start project. When running the console app, it will output the results of the games.
+To run this project as a concept game set the Battleship.Console Project as the Start project. When running the console app, it will output the results of the games.
 
-Note: I was so excited to get into this project I didn't properly read the requirements so I started building a front end in angular. The front end is not complete and only
-allows players to place their ships.
+To run the this project as a web application set the Battleship Project as the Start project.
+
+
