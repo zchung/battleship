@@ -91,6 +91,10 @@ namespace Battleship.Tests.Factories
             result = _gameFactory.GetGameType(new Game(), GameStatus.Started);
 
             Assert.IsInstanceOfType(result, typeof(StartedGame));
+
+            result = _gameFactory.GetGameType(new Game(), GameStatus.Active);
+
+            Assert.IsInstanceOfType(result, typeof(StartedGame));
         }
     }
 }

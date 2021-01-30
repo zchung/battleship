@@ -43,13 +43,13 @@ namespace Battleship.Logic.Services
             return result;
         }
 
-        public async Task<Result<IEnumerable<List>>> GetActiveGames()
+        public async Task<Result<IEnumerable<GameListViewModel>>> GetActiveGames()
         {
-            Result<IEnumerable<List>> result = new Result<IEnumerable<List>>();
+            Result<IEnumerable<GameListViewModel>> result = new Result<IEnumerable<GameListViewModel>>();
             try
             {
                 result.Data = await _battleshipDbContext.Games.Where(x => x.GameStatus == GameStatus.Active)
-                    .Select(s => new List 
+                    .Select(s => new GameListViewModel 
                     { 
                         GameId = s.GameId,
                         Description = s.Description
@@ -93,13 +93,14 @@ namespace Battleship.Logic.Services
             try
             {
                 await _battleshipDbContext.SaveChangesAsync();
+                result.Success = true;
             }
             catch (Exception ex)
             {
                 result.Message = "Error Saving Game";
                 Console.WriteLine(ex.Message); // Logger here.
             }
-            result.Success = true;
+            
             return result;
         }
     }

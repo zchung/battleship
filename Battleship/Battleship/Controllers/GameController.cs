@@ -1,7 +1,6 @@
 ﻿
 using Battleship.Controllers.Interfaces;
 using Battleship.Data.Entities;
-using Battleship.Data.Enums;
 using Battleship.Data.Models;
 using Battleship.Logic.ViewModels;
 using Battleship.Hubs;

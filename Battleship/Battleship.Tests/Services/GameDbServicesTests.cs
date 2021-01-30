@@ -67,6 +67,17 @@ namespace Battleship.Tests.Services
         }
 
         [TestMethod]
+        public async Task GetActiveGames_Should_Return__Error_With_An_Exception()
+        {
+            _battleshipDbContext.Setup(s => s.Games).Throws(new Exception());
+
+            var result = await _gameDbServices.GetActiveGames();
+
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.Message);
+        }
+
+        [TestMethod]
         public void GetById_Should_Return_The_Correct_Game_If_It_Exists()
         {
             Game testGame = new Game { GameId = 1 };
@@ -102,6 +113,26 @@ namespace Battleship.Tests.Services
             Assert.IsFalse(result.Success);
             Assert.IsNull(result.Data);
             Assert.IsNotNull(result.Message);
+        }
+
+        [TestMethod]
+        public async Task SaveChangesAsync_Should_Return_True_If_No_Error()
+        {
+            _battleshipDbContext.Setup(s => s.SaveChangesAsync());
+
+            var result = await _gameDbServices.SaveChangesAsync();
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [TestMethod]
+        public async Task SaveChangesAsync_Should_Return_False_If_Exception_Thrown()
+        {
+            _battleshipDbContext.Setup(s => s.SaveChangesAsync()).Throws(new Exception());
+
+            var result = await _gameDbServices.SaveChangesAsync();
+
+            Assert.IsFalse(result.Success);
         }
     }
 }

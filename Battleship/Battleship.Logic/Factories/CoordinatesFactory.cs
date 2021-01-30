@@ -30,8 +30,6 @@ namespace Battleship.Logic.Factories
                     case ShipOrientationType.VerticalDown:
                         coordinatesViewModel = new CoordinatesViewModel(startPosition.XPosition, startPosition.YPosition + i);
                         break;
-                    default:
-                        break;
                 }
 
                 list.Add(coordinatesViewModel);
