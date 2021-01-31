@@ -95,6 +95,10 @@ namespace Battleship
                 {
                     spa.UseAngularCliServer(npmScript: "start");
                 }
+                else
+                {
+                    spa.UseAngularCliServer(npmScript: "start:prod");
+                }
             });
         }
     }
