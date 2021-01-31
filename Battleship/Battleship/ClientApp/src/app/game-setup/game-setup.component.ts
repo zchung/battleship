@@ -5,7 +5,6 @@ import { SignalRService } from '../Services/signalR-service';
 import { ShipModel } from '../models/ship-model';
 import { IdNamePair } from '../models/id-name-pair';
 import { ShipOrientationType } from '../models/enums/ship-orientation-type';
-import { type } from "os";
 import { CoordinatesModel } from '../models/coordinates-model';
 import { UpdateShipPositionRequest } from '../models/requests/update-ship-position-request';
 import { ShipApiService } from '../Services/ship-api-service';
