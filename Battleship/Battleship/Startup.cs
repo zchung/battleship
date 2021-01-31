@@ -31,8 +31,7 @@ namespace Battleship
             {
                 builder.AllowAnyOrigin()
                        .AllowAnyMethod()
-                       .AllowAnyHeader()
-                       .AllowCredentials();
+                       .AllowAnyHeader();
             }));
 
             //services.AddScoped<IGameDbService, GameDbService>(); // this has been commented out because heroku doesn't support local db.
