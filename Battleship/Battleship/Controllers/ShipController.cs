@@ -45,6 +45,7 @@ namespace Battleship.Controllers
                     {
                         gameResult.Data.Player2ShipsJSON = JsonConvert.SerializeObject(gameViewModel.Ships);
                     }
+                    _gameDbService.Update(gameResult.Data);
                     var saveResult = await _gameDbService.SaveChangesAsync();
                     if (saveResult.Success)
                     {

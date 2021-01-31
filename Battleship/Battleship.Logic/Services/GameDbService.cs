@@ -36,7 +36,7 @@ namespace Battleship.Logic.Services
             }
             catch (Exception ex)
             {
-                result.Message = "Error creating new Game";
+                result.Message = "Error creating new Game.";
                 Console.WriteLine(ex.Message); //normally would log to a service here.
             }
             
@@ -83,6 +83,21 @@ namespace Battleship.Logic.Services
             {
                 result.Message = "Error getting game";
                 Console.WriteLine(ex.Message);
+            }
+            return result;
+        }
+
+        public Result Update(Game game)
+        {
+            Result result = new Result();
+            try
+            {
+                _battleshipDbContext.Games.Update(game);
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Message = "Unable to update";
             }
             return result;
         }

@@ -116,6 +116,27 @@ namespace Battleship.Tests.Services
         }
 
         [TestMethod]
+        public void Update_Should_Return_True_If_No_Error()
+        {
+            _battleshipDbContext.Setup(s => s.Games.Update(It.IsAny<Game>()));
+
+            var result = _gameDbServices.Update(new Game());
+
+            Assert.IsTrue(result.Success);
+        }
+
+        [TestMethod]
+        public void Update_Should_Return_False_If__Error()
+        {
+            _battleshipDbContext.Setup(s => s.Games.Update(It.IsAny<Game>())).Throws(new Exception());
+
+            var result = _gameDbServices.Update(new Game());
+
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.Message);
+        }
+
+        [TestMethod]
         public async Task SaveChangesAsync_Should_Return_True_If_No_Error()
         {
             _battleshipDbContext.Setup(s => s.SaveChangesAsync());

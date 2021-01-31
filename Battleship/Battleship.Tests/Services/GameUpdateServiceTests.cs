@@ -43,6 +43,8 @@ namespace Battleship.Tests.Services
 
             var result = await _gameUpdateService.UpdateGameAfterPlayerJoins(1);
 
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
+
             Assert.IsTrue(result.Success);
             Assert.IsNotNull(result.Data);
             Assert.AreEqual(GameStatus.Planning, result.Data.GameStatus);
@@ -69,6 +71,9 @@ namespace Battleship.Tests.Services
             _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = false });
 
             var result = await _gameUpdateService.UpdateGameAfterPlayerJoins(1);
+
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
+
             Assert.IsFalse(result.Success);
         }
 
@@ -95,6 +100,7 @@ namespace Battleship.Tests.Services
 
             var result = await _gameUpdateService.UpdatePlayerToReady(1, 1);
 
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
             _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
 
             Assert.IsTrue(result.Success);
@@ -124,6 +130,7 @@ namespace Battleship.Tests.Services
 
             var result = await _gameUpdateService.UpdatePlayerToReady(1, 2);
 
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
             _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
 
             Assert.IsTrue(result.Success);
@@ -197,6 +204,7 @@ namespace Battleship.Tests.Services
 
             var result = await _gameUpdateService.UpdateGameStatus(1, gameStatus);
 
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
             _gameDbService.Verify(v => v.SaveChangesAsync(), Times.Once);
 
             Assert.IsTrue(result.Success);
@@ -245,6 +253,8 @@ namespace Battleship.Tests.Services
             
             var result = await _gameUpdateService.ResolvePlayerAttack(1, 1, 2, new CoordinatesViewModel(1, 1));
 
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
+
             Assert.IsTrue(result.Success);
             Assert.IsTrue(gameViewModel.AttemptedCoordinates.Count > 0);
             Assert.IsTrue(gameViewModel.Ships.FirstOrDefault().Coordinates.FirstOrDefault().Hit.Value);
@@ -278,6 +288,8 @@ namespace Battleship.Tests.Services
             _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
 
             var result = await _gameUpdateService.ResolvePlayerAttack(1, 1, 2, new CoordinatesViewModel(1, 1));
+
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
 
             Assert.IsTrue(result.Success);
             Assert.IsTrue(gameViewModel.AttemptedCoordinates.Count > 0);
@@ -342,6 +354,8 @@ namespace Battleship.Tests.Services
             _gameDbService.Setup(s => s.SaveChangesAsync()).ReturnsAsync(new Result { Success = true });
 
             var result = await _gameUpdateService.ResolvePlayerAttack(1, 1, 2, new CoordinatesViewModel(1, 1));
+
+            _gameDbService.Verify(v => v.Update(It.IsAny<Game>()), Times.Once);
 
             Assert.IsTrue(result.Success);
             Assert.IsTrue(gameViewModelPlayer1.AttemptedCoordinates.Count > 0);

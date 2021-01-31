@@ -28,6 +28,7 @@ namespace Battleship.Logic.Services
             {
                 var gameType = _gameFactory.GetGameType(gameResult.Data, GameStatus.Planning);
                 gameType.HandleStatusUpdate();
+                _gameDbService.Update(gameResult.Data);
                 var saveResult = await _gameDbService.SaveChangesAsync();
                 if (saveResult.Success)
                 {
@@ -56,6 +57,7 @@ namespace Battleship.Logic.Services
                 gameResult.Data.GameStatus = status;
                 var gameType = _gameFactory.GetGameType(gameResult.Data, status);
                 gameType.HandleStatusUpdate();
+                _gameDbService.Update(gameResult.Data);
                 var saveResult = await _gameDbService.SaveChangesAsync();
                 if (saveResult.Success)
                 {
@@ -88,6 +90,7 @@ namespace Battleship.Logic.Services
                     {
                         gameResult.Data.Player2Status = PlayerStatus.Ready;
                     }
+                    _gameDbService.Update(gameResult.Data);
                     var saveResult = await _gameDbService.SaveChangesAsync();
                     if (saveResult.Success)
                     {
@@ -146,6 +149,7 @@ namespace Battleship.Logic.Services
                     attackingPlayerResult.WinnerOfGamePlayerId = attackingPlayer.PlayerId;
                     gameResult.Data.GameStatus = GameStatus.Completed;
                 }
+                _gameDbService.Update(gameResult.Data);
                 var saveResult = await _gameDbService.SaveChangesAsync();
                 
                 if (saveResult.Success)

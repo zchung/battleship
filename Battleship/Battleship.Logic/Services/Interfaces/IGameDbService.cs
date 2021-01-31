@@ -13,6 +13,8 @@ namespace Battleship.Logic.Services.Interfaces
 
         Task<Result<IEnumerable<GameListViewModel>>> GetActiveGames();
         Result<Game> GetById(int id);
+
+        Result Update(Game game);
         Task<Result> SaveChangesAsync();
     }
 }
