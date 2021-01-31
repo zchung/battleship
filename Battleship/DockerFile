@@ -1,0 +1,17 @@
+﻿FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS base
+WORKDIR /app
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+WORKDIR /src
+COPY ["Battleship/Battleship.csproj", "Battleship/"]
+COPY ["Battleship.Logic/Battleship.Logic.csproj", "Battleship.Logic/"]
+COPY ["Battleship.Data/Battleship.Data.csproj", "Battleship.Data/"]
+RUN dotnet restore "Battleship/Battleship.csproj"
+COPY . .
+WORKDIR "/src/Battleship"
+RUN dotnet build "Battleship.csproj" -c Release -o /app/build
+FROM build AS publish
+RUN dotnet publish "Battleship.csproj" -c Release -o /app/publish
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet Battleship.dll
