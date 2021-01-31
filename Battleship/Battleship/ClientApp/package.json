@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:prod": "ng serve --configuration=production",
     "build": "ng build",
     "build:ssr": "ng run Battleship:server:dev",
     "test": "ng test",
