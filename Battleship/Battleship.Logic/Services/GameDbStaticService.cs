@@ -15,7 +15,12 @@ namespace Battleship.Logic.Services
         public List<Game> internalList = new List<Game>();
         public Task<Result<Game>> Create(Game game)
         {
-            game.GameId = internalList.Max(x => x.GameId) + 1;
+            int gameId = 1;
+            if (internalList.Any())
+            {
+                gameId = internalList.Max(x => x.GameId) + 1;
+            }
+            game.GameId = gameId;
             internalList.Add(game);
             return Task.FromResult(new Result<Game> { Success = true, Data = game });
         }

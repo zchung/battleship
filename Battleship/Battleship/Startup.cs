@@ -28,7 +28,8 @@ namespace Battleship
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddScoped<IGameDbService, GameDbService>();
+            //services.AddScoped<IGameDbService, GameDbService>(); // this has been commented out because heroku doesn't support local db.
+            services.AddSingleton<IGameDbService, GameDbStaticService>(); // this will mock the db as a singleton class.
             services.AddScoped<IGameFactory, GameFactory>();
             services.AddScoped<IGameUpdateService, GameUpdateService>();
             services.AddScoped<IShipFactory, ShipFactory>(); 
