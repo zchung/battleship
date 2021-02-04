@@ -18,7 +18,10 @@ private baseUrl: string;
  }
   public startConnection = () => {
     this.hubConnection = new signalR.HubConnectionBuilder()
-                            .withUrl(`${this.baseUrl}game`)
+                            .withUrl(`${this.baseUrl}game`, {
+                              skipNegotiation: true,
+                              transport: signalR.HttpTransportType.WebSockets
+                            })
                             .build();
     this.hubConnection
       .start()
