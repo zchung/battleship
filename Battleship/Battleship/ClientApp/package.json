@@ -7,7 +7,7 @@
     "start:prod": "ng serve --configuration=production",
     "build": "ng build",
     "build:ssr": "ng run Battleship:server:dev",
-    "build:github": "ng build --prod --configuration=production --base-href https://zchung.github.io/battleship/",
+    "build:github": "ng build --prod --configuration=production --base-href https://battleshipgame2021.herokuapp.com/",
     "deploy:github": "angular-cli-ghpages -d dist/ --no-silent",
     "test": "ng test",
     "lint": "ng lint",
