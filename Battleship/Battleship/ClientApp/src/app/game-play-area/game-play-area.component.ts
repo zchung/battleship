@@ -69,7 +69,7 @@ export class GamePlayAreaComponent implements OnInit {
       if (data.success) {
         if (data.gameId === this.currentGame.gameId) {
           if (data.playerIdToAttack === this.thisPlayer.playerId) {
-            this.currentGame.currentPlayerIdTurn = data.playerIdToAttack;
+            this.currentGame.currentPlayerIdTurn = this.thisPlayer.playerId;
             this.setCellTypeInThisPlayerGrid.emit(
               new SetNewCoordinatesEvent(data.data, this.coordinatesHelperService.getCellType(data.data.hit))
             );
@@ -94,6 +94,7 @@ export class GamePlayAreaComponent implements OnInit {
         this.setCellTypeInOtherPlayerGrid.emit(
           new SetNewCoordinatesEvent(result.data, this.coordinatesHelperService.getCellType(result.data.hit))
         );
+        this.currentGame.currentPlayerIdTurn = this.otherPlayer.playerId;
       } else {
         alert(result.message);
       }
