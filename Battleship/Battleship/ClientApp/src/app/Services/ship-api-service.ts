@@ -17,6 +17,6 @@ export class ShipApiService {
   }
 
   public updateShipPosition(request: UpdateShipPositionRequest): Observable<Result<ShipModel>> {
-    return this.http.post<Result<ShipModel>>(`${this.baseUrl}updateshipposition`, request);
+    return this.http.post<Result<ShipModel>>(`${environment.baseUrl}ship/updateshipposition`, request);
   }
 }
