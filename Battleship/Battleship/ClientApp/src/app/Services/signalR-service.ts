@@ -6,6 +6,7 @@ import { UpdatedGame } from '../models/updated-game-model';
 import { Result } from '../models/result-data';
 import { CoordinatesModel } from '../models/coordinates-model';
 import { AttackingPlayerResult } from '../models/attacking-player-result';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,11 @@ export class SignalRService {
 private hubConnection: signalR.HubConnection;
 private baseUrl: string;
  constructor(@Inject('BASE_URL') baseUrl: string) {
-   this.baseUrl = baseUrl;
+   if (environment.production) {
+    this.baseUrl = 'https://battleshipgame2021.herokuapp.com/';
+   } else {
+    this.baseUrl = baseUrl;
+   }
  }
   public startConnection = () => {
     this.hubConnection = new signalR.HubConnectionBuilder()
