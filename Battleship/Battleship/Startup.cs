@@ -100,14 +100,10 @@ namespace Battleship
 
                 spa.Options.SourcePath = "ClientApp/dist";
 
-                //if (!env.IsDevelopment())
-                //{
-                //    spa.UseAngularCliServer(npmScript: "start");
-                //}
-                //else
-                //{
-                //    spa.UseAngularCliServer(npmScript: "start:prod");
-                //}
+                if (!env.IsDevelopment())
+                {
+                    spa.UseAngularCliServer(npmScript: "start");
+                }
             });
         }
     }
