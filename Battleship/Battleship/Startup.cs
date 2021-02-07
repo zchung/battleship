@@ -27,8 +27,15 @@ namespace Battleship
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o => o.AddPolicy("AllAccess", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
 
-            services.AddScoped<IGameDbService, GameDbService>();
+            //services.AddScoped<IGameDbService, GameDbService>(); // this has been commented out because heroku doesn't support local db.
+            services.AddSingleton<IGameDbService, GameDbStaticService>(); // this will mock the db as a singleton class.
             services.AddScoped<IGameFactory, GameFactory>();
             services.AddScoped<IGameUpdateService, GameUpdateService>();
             services.AddScoped<IShipFactory, ShipFactory>(); 
@@ -55,7 +62,7 @@ namespace Battleship
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
+        {            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -67,7 +74,7 @@ namespace Battleship
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
             {
@@ -75,6 +82,8 @@ namespace Battleship
             }
 
             app.UseRouting();
+
+            app.UseCors("AllAccess");
 
             app.UseEndpoints(endpoints =>
             {
@@ -89,7 +98,7 @@ namespace Battleship
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "ClientApp/dist";
 
                 if (env.IsDevelopment())
                 {
