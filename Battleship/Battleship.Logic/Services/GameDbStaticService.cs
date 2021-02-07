@@ -12,70 +12,81 @@ namespace Battleship.Logic.Services
 {
     public class GameDbStaticService : IGameDbService
     {
+        public object lockingObject = new object();
         public List<Game> internalList = new List<Game>();
         public Task<Result<Game>> Create(Game game)
         {
-            int gameId = 1;
-            if (internalList.Any())
+            lock (lockingObject)
             {
-                gameId = internalList.Max(x => x.GameId) + 1;
-            }
-            game.GameId = gameId;
-            internalList.Add(game);
-            return Task.FromResult(new Result<Game> { Success = true, Data = game });
+                int gameId = 1;
+                if (internalList.Any())
+                {
+                    gameId = internalList.Max(x => x.GameId) + 1;
+                }
+                game.GameId = gameId;
+                internalList.Add(game);
+                return Task.FromResult(new Result<Game> { Success = true, Data = game });
+            }          
         }
 
         public Task<Result<IEnumerable<GameListViewModel>>> GetActiveGames()
         {
-            return Task.FromResult(new Result<IEnumerable<GameListViewModel>>
+            lock (lockingObject)
             {
-                Data = internalList.Where(x => x.GameStatus == GameStatus.Active)
+                return Task.FromResult(new Result<IEnumerable<GameListViewModel>>
+                {
+                    Data = internalList.Where(x => x.GameStatus == GameStatus.Active)
                 .Select(s => new GameListViewModel
                 {
                     Description = s.Description,
                     GameId = s.GameId
                 }),
-                Success = true
-            });
+                    Success = true
+                });
+            } 
         }
 
         public Result<Game> GetById(int id)
-        { 
-
-            var result = new Result<Game>();
-            result.Data = internalList.FirstOrDefault(x => x.GameId == id);
-            if (result.Data == null)
+        {
+            lock (lockingObject)
             {
-                result.Message = "No Game found";
-            }
-            else
-            {
-                result.Success = true;
-            }
-            return result;
-
+                var result = new Result<Game>();
+                result.Data = internalList.FirstOrDefault(x => x.GameId == id);
+                if (result.Data == null)
+                {
+                    result.Message = "No Game found";
+                }
+                else
+                {
+                    result.Success = true;
+                }
+                return result;
+            }           
         }
 
         public Result Update(Game game)
 
         {
-            Result result = new Result();
-            result.Success = true;
-            var matchingGame = internalList.FirstOrDefault(x => x.GameId == game.GameId);
-            if (matchingGame != null)
+            lock (lockingObject)
             {
-                matchingGame.CurrentPlayerIdTurn = game.CurrentPlayerIdTurn;
-                matchingGame.Description = game.Description;
-                matchingGame.GameStatus = game.GameStatus;
-                matchingGame.Player1AttemptedCoordinatesJSON = game.Player1AttemptedCoordinatesJSON;
-                matchingGame.Player1ShipsJSON = game.Player1ShipsJSON;
-                matchingGame.Player2AttemptedCoordinatesJSON = game.Player2AttemptedCoordinatesJSON;
-                matchingGame.Player2ShipsJSON = game.Player2ShipsJSON;
-                matchingGame.Player1Status = game.Player1Status;
-                matchingGame.Player2Status = game.Player2Status;
-            }
+                Result result = new Result();
+                result.Success = true;
+                var matchingGame = internalList.FirstOrDefault(x => x.GameId == game.GameId);
+                if (matchingGame != null)
+                {
+                    matchingGame.CurrentPlayerIdTurn = game.CurrentPlayerIdTurn;
+                    matchingGame.Description = game.Description;
+                    matchingGame.GameStatus = game.GameStatus;
+                    matchingGame.Player1AttemptedCoordinatesJSON = game.Player1AttemptedCoordinatesJSON;
+                    matchingGame.Player1ShipsJSON = game.Player1ShipsJSON;
+                    matchingGame.Player2AttemptedCoordinatesJSON = game.Player2AttemptedCoordinatesJSON;
+                    matchingGame.Player2ShipsJSON = game.Player2ShipsJSON;
+                    matchingGame.Player1Status = game.Player1Status;
+                    matchingGame.Player2Status = game.Player2Status;
+                }
 
-            return result;
+                return result;
+            }           
         }
 
         public Task<Result> SaveChangesAsync()
